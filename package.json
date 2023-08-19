@@ -1,0 +1,11 @@
+{
+  "name": "discordrichpresence",
+  "version": "1.0.0",
+  "description": "A Discord Rich Presence Program",
+  "main": "node.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "Clément Vassaux",
+  "license": "ISC"
+}
