@@ -1,8 +1,13 @@
 import curses
+import webbrowser
 
 def read_ascii_title():
     with open("title.txt", "r", encoding="utf-8") as file:
         return file.read().splitlines()
+
+def githubPage():
+    webbrowser.open('https://github.com/Locox-dev/FlowCord')
+
 
 def main(stdscr):
     # Setup
@@ -14,9 +19,9 @@ def main(stdscr):
     # Create some UI elements
     ascii_title = read_ascii_title()
     menu_options = [
-        ["Help", "Rich Presence", "Option 3"],
-        ["Github page", "Option 5", "Option 6"],
-        ["Donate", "Option 8", "Option 9"]
+        ["Help", "Github Page", "Donate"],
+        ["Rich Presence", "Option 5", "Option 6"],
+        ["Option 7", "Option 8", "Option 9"]
     ]
     current_column = 0
     current_row = 0
@@ -67,10 +72,13 @@ def main(stdscr):
             current_column = max(current_column - 1, 0)
         elif key == ord('d'):  # D key for moving right
             current_column = min(current_column + 1, len(menu_options[0]) - 1)
-        elif key == ord('\n'):
+        elif key == ord('\n') or key == ord(' '):
             # Perform some action based on the selected option
             selected_option = menu_options[current_row][current_column]
             stdscr.addstr(menu_top + len(menu_options), 0, f"Selected: {selected_option}")
+
+            if(selected_option == "Github Page"):
+                githubPage()
 
         stdscr.refresh()
 
