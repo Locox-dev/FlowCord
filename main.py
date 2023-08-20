@@ -8,6 +8,8 @@ def main(stdscr):
     # Setup
     curses.curs_set(0)  # Hide the cursor
     stdscr.nodelay(1)   # Make getch() non-blocking
+    curses.start_color()  # Enable color support
+    curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)  # Define a color pair (1)
 
     # Create some UI elements
     ascii_title = read_ascii_title()
@@ -30,12 +32,28 @@ def main(stdscr):
 
         # Display menu options
         menu_top = title_height + 2  # Position of the first menu option
+        menu_width_multiplicator = 20
         for row, options in enumerate(menu_options):
-            for col, option in enumerate(options):
-                if col == current_column and row == current_row:
-                    stdscr.addstr(menu_top + row, col * 15, f"> {option}", curses.A_REVERSE)
-                else:
-                    stdscr.addstr(menu_top + row, col * 15, f"  {option}")
+            if(row == 0):
+                for col, option in enumerate(options):
+                    if col == current_column and row == current_row:
+                        stdscr.addstr(menu_top + row, col * menu_width_multiplicator, f"> {option}", curses.color_pair(1) | curses.A_BOLD)
+                    else:
+                        stdscr.addstr(menu_top + row, col * menu_width_multiplicator, f"  {option}")
+                    separator = "-" * (len(options) * menu_width_multiplicator)
+                    stdscr.addstr(menu_top + row + 1, 0, separator)
+            if(row == 1):
+                for col, option in enumerate(options):
+                    if col == current_column and row == current_row:
+                        stdscr.addstr(menu_top + row + 1, col * menu_width_multiplicator, f"> {option}", curses.color_pair(1) | curses.A_BOLD)
+                    else:
+                        stdscr.addstr(menu_top + row + 1, col * menu_width_multiplicator, f"  {option}")
+            if(row == 2):
+                for col, option in enumerate(options):
+                    if col == current_column and row == current_row:
+                        stdscr.addstr(menu_top + row + 1, col * menu_width_multiplicator, f"> {option}", curses.color_pair(1) | curses.A_BOLD)
+                    else:
+                        stdscr.addstr(menu_top + row + 1, col * menu_width_multiplicator, f"  {option}")
 
         # Get user input
         key = stdscr.getch()
