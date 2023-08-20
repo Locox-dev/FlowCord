@@ -1,15 +1,59 @@
 import curses
 import webbrowser
 
+# Define the states
+STATE_MAIN_MENU = 0
+STATE_HELP = 1
+
 def read_ascii_title():
     with open("title.txt", "r", encoding="utf-8") as file:
         return file.read().splitlines()
+    
+def displayMainMenu(stdscr, ascii_title, menu_options, current_column, current_row):
+    # Display ASCII art title
+    title_height = len(ascii_title)
+    title_left_margin = 2  # Position from the left margin
+    for i, line in enumerate(ascii_title):
+        stdscr.addstr(i, title_left_margin, line, curses.A_BOLD)
+
+    # Display menu options
+    menu_top = title_height + 2  # Position of the first menu option
+    menu_width_multiplicator = 20
+    for row, options in enumerate(menu_options):
+        if(row == 0):
+            for col, option in enumerate(options):
+                if col == current_column and row == current_row:
+                    stdscr.addstr(menu_top + row, col * menu_width_multiplicator, f"> {option}", curses.color_pair(1) | curses.A_BOLD)
+                else:
+                    stdscr.addstr(menu_top + row, col * menu_width_multiplicator, f"  {option}")
+                separator = "-" * (len(options) * menu_width_multiplicator)
+                stdscr.addstr(menu_top + row + 1, 0, separator)
+        if(row == 1):
+            for col, option in enumerate(options):
+                if col == current_column and row == current_row:
+                    stdscr.addstr(menu_top + row + 1, col * menu_width_multiplicator, f"> {option}", curses.color_pair(1) | curses.A_BOLD)
+                else:
+                    stdscr.addstr(menu_top + row + 1, col * menu_width_multiplicator, f"  {option}")
+        if(row == 2):
+            for col, option in enumerate(options):
+                if col == current_column and row == current_row:
+                    stdscr.addstr(menu_top + row + 1, col * menu_width_multiplicator, f"> {option}", curses.color_pair(1) | curses.A_BOLD)
+                else:
+                    stdscr.addstr(menu_top + row + 1, col * menu_width_multiplicator, f"  {option}")
+
+def displayHelp(stdscr, menu_options):
+    stdscr.addstr(0, 0, "VERY LONG TEXT HERE")
+    stdscr.addstr(10, 10, f"> {menu_options[0][0]}", curses.color_pair(1) | curses.A_BOLD)
+
 
 def githubPage():
     webbrowser.open('https://github.com/Locox-dev/FlowCord')
 
 
 def main(stdscr):
+
+    state = STATE_MAIN_MENU  # Initial state
+
     # Setup
     curses.curs_set(0)  # Hide the cursor
     stdscr.nodelay(1)   # Make getch() non-blocking
@@ -26,39 +70,19 @@ def main(stdscr):
     current_column = 0
     current_row = 0
 
+    back_button = [
+        ["Back (Escape)"]
+    ]
+
     while True:
         stdscr.clear()
 
-        # Display ASCII art title
-        title_height = len(ascii_title)
-        title_left_margin = 2  # Position from the left margin
-        for i, line in enumerate(ascii_title):
-            stdscr.addstr(i, title_left_margin, line, curses.A_BOLD)
+        if(state == STATE_MAIN_MENU):
+            displayMainMenu(stdscr, ascii_title, menu_options, current_column, current_row)
+        elif(state == STATE_HELP):
+            displayHelp(stdscr, back_button)
 
-        # Display menu options
-        menu_top = title_height + 2  # Position of the first menu option
-        menu_width_multiplicator = 20
-        for row, options in enumerate(menu_options):
-            if(row == 0):
-                for col, option in enumerate(options):
-                    if col == current_column and row == current_row:
-                        stdscr.addstr(menu_top + row, col * menu_width_multiplicator, f"> {option}", curses.color_pair(1) | curses.A_BOLD)
-                    else:
-                        stdscr.addstr(menu_top + row, col * menu_width_multiplicator, f"  {option}")
-                    separator = "-" * (len(options) * menu_width_multiplicator)
-                    stdscr.addstr(menu_top + row + 1, 0, separator)
-            if(row == 1):
-                for col, option in enumerate(options):
-                    if col == current_column and row == current_row:
-                        stdscr.addstr(menu_top + row + 1, col * menu_width_multiplicator, f"> {option}", curses.color_pair(1) | curses.A_BOLD)
-                    else:
-                        stdscr.addstr(menu_top + row + 1, col * menu_width_multiplicator, f"  {option}")
-            if(row == 2):
-                for col, option in enumerate(options):
-                    if col == current_column and row == current_row:
-                        stdscr.addstr(menu_top + row + 1, col * menu_width_multiplicator, f"> {option}", curses.color_pair(1) | curses.A_BOLD)
-                    else:
-                        stdscr.addstr(menu_top + row + 1, col * menu_width_multiplicator, f"  {option}")
+
 
         # Get user input
         key = stdscr.getch()
@@ -75,10 +99,11 @@ def main(stdscr):
         elif key == ord('\n') or key == ord(' '):
             # Perform some action based on the selected option
             selected_option = menu_options[current_row][current_column]
-            stdscr.addstr(menu_top + len(menu_options), 0, f"Selected: {selected_option}")
 
             if(selected_option == "Github Page"):
                 githubPage()
+            if(selected_option == "Help"):
+                state = STATE_HELP
 
         stdscr.refresh()
 
