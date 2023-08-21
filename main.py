@@ -1,5 +1,6 @@
 import curses
 import webbrowser
+from creator import *
 
 # Define the states
 STATE_MAIN_MENU = 0
@@ -18,7 +19,7 @@ def displayMainMenu(stdscr, ascii_title, menu_options, current_column, current_r
 
     # Display menu options
     menu_top = title_height + 2  # Position of the first menu option
-    menu_width_multiplicator = 20
+    menu_width_multiplicator = 30
     for row, options in enumerate(menu_options):
         if(row == 0):
             for col, option in enumerate(options):
@@ -49,7 +50,6 @@ def displayHelp(stdscr, menu_options):
 def githubPage():
     webbrowser.open('https://github.com/Locox-dev/FlowCord')
 
-
 def main(stdscr):
 
     state = STATE_MAIN_MENU  # Initial state
@@ -64,7 +64,7 @@ def main(stdscr):
     ascii_title = read_ascii_title()
     menu_options = [
         ["Help", "Github Page", "Donate"],
-        ["Rich Presence", "Option 5", "Option 6"],
+        ["Create Rich Presence", "Enable Rich Presence", "Option 6"],
         ["Option 7", "Option 8", "Option 9"]
     ]
     current_column = 0
@@ -105,6 +105,8 @@ def main(stdscr):
                     githubPage()
                 if(selected_option == "Help"):
                     state = STATE_HELP
+                if(selected_option == "Create Rich Presence"):
+                    createInstructions()
         elif(state == STATE_HELP):
             if key == ord('\n') or key == ord(' '):
                 state = STATE_MAIN_MENU
