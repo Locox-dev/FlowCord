@@ -1,10 +1,16 @@
 import curses
 import webbrowser
 from creator import *
+import time
+
+
 
 # Define the states
 STATE_MAIN_MENU = 0
 STATE_HELP = 1
+STATE_CREATE_RICH_PRESENCE = 2
+
+state = STATE_MAIN_MENU  # Initial state
 
 def read_ascii_title():
     with open("title.txt", "r", encoding="utf-8") as file:
@@ -46,13 +52,38 @@ def displayHelp(stdscr, menu_options):
     stdscr.addstr(0, 0, "VERY LONG TEXT HERE")
     stdscr.addstr(10, 10, f"> {menu_options[0][0]}", curses.color_pair(1) | curses.A_BOLD)
 
+def displayCreateRichPresence(stdscr): # Always need to add something after an input or else it will all reset idk why
+
+    global state
+
+    clientID = rawInput(stdscr, 1, 0, "Client ID:")
+    if(len(clientID.decode()) >= 17):
+        stdscr.addstr(2, 0, "> " + clientID.decode() + " saved!")
+        largeImageText = rawInput(stdscr, 3, 0, "Large Image Text:")
+        if(largeImageText != ""):
+            stdscr.addstr(4, 0, "> " + largeImageText.decode() + " saved!")
+            smallImageText = rawInput(stdscr, 5, 0, "Small Image Text:")
+    else:
+        stdscr.addstr(3, 0, "PLEASE ENTER A CORRECT CLIENT ID")
+        stdscr.addstr(4, 0, "THIS PAGE WILL AUTO DELETE IN 3 SECONDS, PLEASE WAIT")
+        time.sleep(3)
+        state = STATE_MAIN_MENU
+
 
 def githubPage():
     webbrowser.open('https://github.com/Locox-dev/FlowCord')
 
+def rawInput(stdscr, r, c, prompt_string):
+    curses.echo() 
+    stdscr.addstr(r, c, prompt_string)
+    stdscr.addstr(r + 1, c, "> ")
+    stdscr.refresh()
+    input = stdscr.getstr(r + 1, c + 2, 20)
+    return input
+
 def main(stdscr):
 
-    state = STATE_MAIN_MENU  # Initial state
+    global state
 
     # Setup
     curses.curs_set(0)  # Hide the cursor
@@ -81,6 +112,8 @@ def main(stdscr):
             displayMainMenu(stdscr, ascii_title, menu_options, current_column, current_row)
         elif(state == STATE_HELP):
             displayHelp(stdscr, back_button)
+        elif(state == STATE_CREATE_RICH_PRESENCE):
+            displayCreateRichPresence(stdscr)
 
 
 
@@ -106,9 +139,13 @@ def main(stdscr):
                 if(selected_option == "Help"):
                     state = STATE_HELP
                 if(selected_option == "Create Rich Presence"):
-                    createInstructions()
+                    state = STATE_CREATE_RICH_PRESENCE
+                    #createInstructions()
         elif(state == STATE_HELP):
             if key == ord('\n') or key == ord(' '):
+                state = STATE_MAIN_MENU
+        elif(state == STATE_CREATE_RICH_PRESENCE):
+            if key == 27:
                 state = STATE_MAIN_MENU
 
         stdscr.refresh()
