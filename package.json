@@ -7,5 +7,8 @@
     "test": "test"
   },
   "author": "Clément Vassaux",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "discord-rpc": "^4.0.1"
+  }
 }
