@@ -87,23 +87,27 @@ def main(stdscr):
         # Get user input
         key = stdscr.getch()
 
-        # Handle ZQSD key presses
-        if key == ord('z'):  # Z key for moving up
-            current_row = max(current_row - 1, 0)
-        elif key == ord('s'):  # S key for moving down
-            current_row = min(current_row + 1, len(menu_options) - 1)
-        elif key == ord('q'):  # Q key for moving left
-            current_column = max(current_column - 1, 0)
-        elif key == ord('d'):  # D key for moving right
-            current_column = min(current_column + 1, len(menu_options[0]) - 1)
-        elif key == ord('\n') or key == ord(' '):
-            # Perform some action based on the selected option
-            selected_option = menu_options[current_row][current_column]
+        # Handle ZQSD key presses in different states
+        if(state == STATE_MAIN_MENU):
+            if key == ord('z'):  # Z key for moving up
+                current_row = max(current_row - 1, 0)
+            elif key == ord('s'):  # S key for moving down
+                current_row = min(current_row + 1, len(menu_options) - 1)
+            elif key == ord('q'):  # Q key for moving left
+                current_column = max(current_column - 1, 0)
+            elif key == ord('d'):  # D key for moving right
+                current_column = min(current_column + 1, len(menu_options[0]) - 1)
+            elif key == ord('\n') or key == ord(' '):
+                # Perform some action based on the selected option
+                selected_option = menu_options[current_row][current_column]
 
-            if(selected_option == "Github Page"):
-                githubPage()
-            if(selected_option == "Help"):
-                state = STATE_HELP
+                if(selected_option == "Github Page"):
+                    githubPage()
+                if(selected_option == "Help"):
+                    state = STATE_HELP
+        elif(state == STATE_HELP):
+            if key == ord('\n') or key == ord(' '):
+                state = STATE_MAIN_MENU
 
         stdscr.refresh()
 
