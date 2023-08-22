@@ -24,5 +24,18 @@
         "Url2": "",
         "State": "",
         "Details": ""
+    },
+    "Test": {
+        "ClientID": "1143116249732227192",
+        "LargeImage": "",
+        "LargeImageText": "COUCOU",
+        "SmallImage": "small",
+        "SmallImageText": "",
+        "Button1": "",
+        "Url1": "",
+        "Button2": "",
+        "Url2": "",
+        "State": "Hello",
+        "Details": "Hello"
     }
 }

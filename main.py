@@ -1,7 +1,8 @@
 import curses
 import webbrowser
+import subprocess
 from creator import *
-import time
+import threading
 import json
 from os import system
 
@@ -13,6 +14,8 @@ STATE_CREATE_RICH_PRESENCE = 2
 STATE_SELECT_RICH_PRESENCE = 3
 
 state = STATE_MAIN_MENU  # Initial state
+richPresence = False
+richPresenceName = ""
 
 def read_ascii_title():
     with open("title.txt", "r", encoding="utf-8") as file:
@@ -23,10 +26,10 @@ def displayMainMenu(stdscr, ascii_title, menu_options, current_column, current_r
     title_height = len(ascii_title)
     title_left_margin = 2  # Position from the left margin
     for i, line in enumerate(ascii_title):
-        stdscr.addstr(i, title_left_margin, line, curses.A_BOLD)
+        stdscr.addstr(i + 1, title_left_margin, line, curses.A_BOLD)
 
     # Display menu options
-    menu_top = title_height + 2  # Position of the first menu option
+    menu_top = title_height + 3  # Position of the first menu option
     menu_width_multiplicator = 30
     for row, options in enumerate(menu_options):
         if(row == 0):
@@ -136,9 +139,15 @@ def rawInput(stdscr, r, c, prompt_string):
     input = stdscr.getstr(r + 1, c + 2, 20)
     return input
 
+def runRichPresence(selected):
+    node_cmd = ["node", "node.js", selected]
+    subprocess.run(node_cmd, text=True)
+
 def main(stdscr):
 
     global state
+    global richPresence
+    global richPresenceName
     
     system('mode con: cols=120 lines=30') # Resize terminal window
 
@@ -178,6 +187,9 @@ def main(stdscr):
         elif(state == STATE_SELECT_RICH_PRESENCE):
             displaySelectRichPresence(stdscr, settings_data, current_row_select_rich_presence)
 
+        if(richPresence == True):
+            stdscr.addstr(0, 0, richPresenceName + " running.")
+
 
         # Get user input
         key = stdscr.getch()
@@ -211,10 +223,16 @@ def main(stdscr):
             elif (key == ord('s') or key == curses.KEY_DOWN):
                 current_row_select_rich_presence = min(current_row_select_rich_presence + 1, len(list(settings_data.keys())) - 1)
             elif (key == ord('\n') or key == ord(' ')):
-                selected_template_rpc = list(settings_data.keys())[current_row_select_rich_presence]
-                
+                selected = list(settings_data.keys())[current_row_select_rich_presence]
+
+                node_thread = threading.Thread(target=runRichPresence, args=(selected,))
+                node_thread.start()
+
+                state = STATE_MAIN_MENU
+                richPresence = True
+                richPresenceName = selected
                 # Now switch to a new state where you can handle the selected template/RPC
-                state = STATE_SELECT_RICH_PRESENCE
+                #state = STATE_SELECT_RICH_PRESENCE
         elif(state == STATE_HELP):
             if (key == ord('\n') or key == ord(' ')):
                 state = STATE_MAIN_MENU

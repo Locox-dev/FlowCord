@@ -27,7 +27,7 @@ def add_instructions(driver, instructions_text):
     driver.execute_script(instructions_script, instructions_text)
 
 def createInstructions():    
-    driver = webdriver.Firefox()
+    driver = webdriver.Chrome()
 
     # Ouvrir le portail des développeurs de Discord
     driver.get('https://discord.com/developers/applications')
