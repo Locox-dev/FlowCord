@@ -213,8 +213,11 @@ def main(stdscr):
                 if(selected_option == "Help"):
                     state = STATE_HELP
                 if(selected_option == "Create Rich Presence"):
+                    
+                    createrpc_thread = threading.Thread(target=createInstructions)
+                    createrpc_thread.start()
+
                     state = STATE_CREATE_RICH_PRESENCE
-                    #createInstructions()
                 if(selected_option == "Select Rich Presence"):
                     state = STATE_SELECT_RICH_PRESENCE
         elif(state == STATE_SELECT_RICH_PRESENCE):
