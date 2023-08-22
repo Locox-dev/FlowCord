@@ -179,7 +179,6 @@ def main(stdscr):
             displaySelectRichPresence(stdscr, settings_data, current_row_select_rich_presence)
 
 
-
         # Get user input
         key = stdscr.getch()
 
@@ -213,6 +212,7 @@ def main(stdscr):
                 current_row_select_rich_presence = min(current_row_select_rich_presence + 1, len(list(settings_data.keys())) - 1)
             elif (key == ord('\n') or key == ord(' ')):
                 selected_template_rpc = list(settings_data.keys())[current_row_select_rich_presence]
+                
                 # Now switch to a new state where you can handle the selected template/RPC
                 state = STATE_SELECT_RICH_PRESENCE
         elif(state == STATE_HELP):

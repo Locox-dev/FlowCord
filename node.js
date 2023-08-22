@@ -1,8 +1,25 @@
 const rpc = require("discord-rpc");
 const client = new rpc.Client({ transport: 'ipc' });
-const config = require('./config.json');
+const config = require('./settings.json');
 
-client.login({ clientId: config.ClientID }).catch(console.error);
+var selectedConfigName = ""
+process.argv.forEach(function (val, index, array) {
+    if(index == 2) {
+        selectedConfigName = val;
+    }
+    if(index > 2) {
+        selectedConfigName = selectedConfigName + " " + val;
+    }
+});
+
+const selectedConfig = config[selectedConfigName];
+
+if (!selectedConfig) {
+    console.error(`Configuration "${selectedConfigName}" not found in settings.json`);
+    process.exit(1);
+}
+
+client.login({ clientId: selectedConfig.ClientID }).catch(console.error);
 
 client.on('ready', () => {
     console.log('[DEBUG] Presence now active!')
@@ -19,35 +36,35 @@ client.on('ready', () => {
         }
     };
 
-    if (config.Details) {
-        activity.activity.details = config.Details;
+    if (selectedConfig.Details) {
+        activity.activity.details = selectedConfig.Details;
     }
-    if (config.State) {
-        activity.activity.state = config.State;
+    if (selectedConfig.State) {
+        activity.activity.state = selectedConfig.State;
     }
-    if (config.LargeImage) {
-        activity.activity.assets.large_image = config.LargeImage;
+    if (selectedConfig.LargeImage) {
+        activity.activity.assets.large_image = selectedConfig.LargeImage;
     }
-    if (config.LargeImageText && config.LargeImage) {
-        activity.activity.assets.large_text = config.LargeImageText;
+    if (selectedConfig.LargeImageText && selectedConfig.LargeImage) {
+        activity.activity.assets.large_text = selectedConfig.LargeImageText;
     }
-    if (config.SmallImage) {
-        activity.activity.assets.small_image = config.SmallImage;
+    if (selectedConfig.SmallImage) {
+        activity.activity.assets.small_image = selectedConfig.SmallImage;
     }
-    if (config.SmallImageText && config.SmallImage) {
-        activity.activity.assets.small_text = config.SmallImageText;
+    if (selectedConfig.SmallImageText && selectedConfig.SmallImage) {
+        activity.activity.assets.small_text = selectedConfig.SmallImageText;
     }
-    if (config.Button1 && config.Url1) {
+    if (selectedConfig.Button1 && selectedConfig.Url1) {
         activity.activity.buttons = [{
-            label: config.Button1,
-            url: config.Url1
+            label: selectedConfig.Button1,
+            url: selectedConfig.Url1
         }];
     }
-    if (config.Button2 && config.Url2) {
+    if (selectedConfig.Button2 && selectedConfig.Url2) {
         activity.activity.buttons = activity.activity.buttons || [];
         activity.activity.buttons.push({
-            label: config.Button2,
-            url: config.Url2
+            label: selectedConfig.Button2,
+            url: selectedConfig.Url2
         });
     }
 
