@@ -5,8 +5,6 @@ import time
 import json
 from os import system
 
-system('mode con: cols=120 lines=30')
-
 
 # Define the states
 STATE_MAIN_MENU = 0
@@ -128,6 +126,8 @@ def rawInput(stdscr, r, c, prompt_string):
 def main(stdscr):
 
     global state
+    
+    system('mode con: cols=120 lines=30') # Resize terminal window
 
     # Setup
     curses.curs_set(0)  # Hide the cursor
