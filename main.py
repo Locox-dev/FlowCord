@@ -3,6 +3,9 @@ import webbrowser
 from creator import *
 import time
 import json
+from os import system
+
+system('mode con: cols=120 lines=30')
 
 
 # Define the states
@@ -55,11 +58,11 @@ def displayHelp(stdscr, menu_options):
 def displayCreateRichPresence(stdscr, settings_data): # Always need to add something after an input or else it will all reset idk why
     global state
     
-    stdscr.addstr(1, 0, "INFORMATIONS: press shift + ctrl + v to paste things.")
+    stdscr.addstr(1, 0, "Press shift + ctrl + v to paste things. (*) mean this field is mandatory.")
     richPresenceName = rawInput(stdscr, 2, 0, "Name:")
     if(richPresenceName.decode() != ""):
         stdscr.addstr(3, 0, "> " + richPresenceName.decode() + " saved!")
-        clientID = rawInput(stdscr, 4, 0, "Client ID:") 
+        clientID = rawInput(stdscr, 4, 0, "Client ID (*):") 
         if(len(clientID.decode()) >= 17):
             stdscr.addstr(5, 0, "> " + clientID.decode() + " saved!")
             largeImageText = rawInput(stdscr, 6, 0, "Large Image Text:")

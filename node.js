@@ -12,8 +12,6 @@ client.on('ready', () => {
     const activity = {
         pid: process.pid,
         activity: {
-            details: config.Details,
-            state: config.State,
             timestamps: {
                 start: Date.now()
             },
@@ -21,6 +19,12 @@ client.on('ready', () => {
         }
     };
 
+    if (config.Details) {
+        activity.activity.details = config.Details;
+    }
+    if (config.State) {
+        activity.activity.state = config.State;
+    }
     if (config.LargeImage) {
         activity.activity.assets.large_image = config.LargeImage;
     }
