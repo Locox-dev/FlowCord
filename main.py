@@ -10,6 +10,7 @@ from os import system
 STATE_MAIN_MENU = 0
 STATE_HELP = 1
 STATE_CREATE_RICH_PRESENCE = 2
+STATE_SELECT_RICH_PRESENCE = 3
 
 state = STATE_MAIN_MENU  # Initial state
 
@@ -111,6 +112,18 @@ def displayCreateRichPresence(stdscr, settings_data): # Always need to add somet
         err = rawInput(stdscr, 2, 0, "PLEASE ENTER A CORRECT NAME, AT LEAST ONE CHARACTER LONG. \n  PRESS ENTER TO RETURN BACK TO MAIN MENU")
         state = STATE_MAIN_MENU
 
+def displaySelectRichPresence(stdscr, settings_data, current_selection):
+    stdscr.addstr(0, 0, "Select Rich Presence:")
+    options = list(settings_data.keys())  # Get the keys (template/RPC names) from settings_data
+
+    for i, option in enumerate(options):
+        if i == current_selection:
+            stdscr.addstr(i + 2, 0, f"> {option}", curses.color_pair(1) | curses.A_BOLD)
+        else:
+            stdscr.addstr(i + 2, 0, f"  {option}")
+
+    stdscr.refresh()
+
 
 def githubPage():
     webbrowser.open('https://github.com/Locox-dev/FlowCord')
@@ -139,11 +152,12 @@ def main(stdscr):
     ascii_title = read_ascii_title()
     menu_options = [
         ["Help", "Github Page", "Donate"],
-        ["Create Rich Presence", "Enable Rich Presence", "Delete Rich Presence"],
+        ["Create Rich Presence", "Select Rich Presence", "Delete Rich Presence"],
         ["Option 7", "Option 8", "Option 9"]
     ]
     current_column = 0
     current_row = 0
+    current_row_select_rich_presence = 0
     
     back_button = [
         ["Back (Escape)"]
@@ -161,6 +175,8 @@ def main(stdscr):
             displayHelp(stdscr, back_button)
         elif(state == STATE_CREATE_RICH_PRESENCE):
             displayCreateRichPresence(stdscr, settings_data)
+        elif(state == STATE_SELECT_RICH_PRESENCE):
+            displaySelectRichPresence(stdscr, settings_data, current_row_select_rich_presence)
 
 
 
@@ -188,12 +204,23 @@ def main(stdscr):
                 if(selected_option == "Create Rich Presence"):
                     state = STATE_CREATE_RICH_PRESENCE
                     #createInstructions()
+                if(selected_option == "Select Rich Presence"):
+                    state = STATE_SELECT_RICH_PRESENCE
+        elif(state == STATE_SELECT_RICH_PRESENCE):
+            if key == ord('z'):
+                current_row_select_rich_presence = max(current_row_select_rich_presence - 1, 0)
+            elif key == ord('s'):
+                current_row_select_rich_presence = min(current_row_select_rich_presence + 1, len(list(settings_data.keys())) - 1)
+            elif key == ord('\n') or key == ord(' '):
+                selected_template_rpc = list(settings_data.keys())[current_row_select_rich_presence]
+                # Now switch to a new state where you can handle the selected template/RPC
+                state = STATE_SELECT_RICH_PRESENCE
         elif(state == STATE_HELP):
             if key == ord('\n') or key == ord(' '):
                 state = STATE_MAIN_MENU
-        elif(state == STATE_CREATE_RICH_PRESENCE):
-            if key == 27:
-                state = STATE_MAIN_MENU
+
+        if key == 27:
+            state = STATE_MAIN_MENU
 
         stdscr.refresh()
 
