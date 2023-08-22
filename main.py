@@ -56,7 +56,7 @@ def displayCreateRichPresence(stdscr): # Always need to add something after an i
 
     global state
 
-    clientID = rawInput(stdscr, 1, 0, "Client ID:")
+    clientID = rawInput(stdscr, 1, 0, "Client ID:") 
     if(len(clientID.decode()) >= 17):
         stdscr.addstr(2, 0, "> " + clientID.decode() + " saved!")
         largeImageText = rawInput(stdscr, 3, 0, "Large Image Text:")
@@ -64,9 +64,7 @@ def displayCreateRichPresence(stdscr): # Always need to add something after an i
             stdscr.addstr(4, 0, "> " + largeImageText.decode() + " saved!")
             smallImageText = rawInput(stdscr, 5, 0, "Small Image Text:")
     else:
-        stdscr.addstr(3, 0, "PLEASE ENTER A CORRECT CLIENT ID")
-        stdscr.addstr(4, 0, "THIS PAGE WILL AUTO DELETE IN 3 SECONDS, PLEASE WAIT")
-        time.sleep(3)
+        err = rawInput(stdscr, 3, 0, "PLEASE ENTER A CORRECT CLIENT ID. \n  PRESS ENTER TO RETURN BACK TO MAIN MENU.")
         state = STATE_MAIN_MENU
 
 
@@ -95,7 +93,7 @@ def main(stdscr):
     ascii_title = read_ascii_title()
     menu_options = [
         ["Help", "Github Page", "Donate"],
-        ["Create Rich Presence", "Enable Rich Presence", "Option 6"],
+        ["Create Rich Presence", "Enable Rich Presence", "Delete Rich Presence"],
         ["Option 7", "Option 8", "Option 9"]
     ]
     current_column = 0
