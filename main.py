@@ -185,15 +185,15 @@ def main(stdscr):
 
         # Handle ZQSD key presses in different states
         if(state == STATE_MAIN_MENU):
-            if key == ord('z'):  # Z key for moving up
+            if (key == ord('z') or key == curses.KEY_UP):  # Z key for moving up
                 current_row = max(current_row - 1, 0)
-            elif key == ord('s'):  # S key for moving down
+            elif (key == ord('s') or key == curses.KEY_DOWN):  # S key for moving down
                 current_row = min(current_row + 1, len(menu_options) - 1)
-            elif key == ord('q'):  # Q key for moving left
+            elif (key == ord('q') or key == curses.KEY_LEFT):  # Q key for moving left
                 current_column = max(current_column - 1, 0)
-            elif key == ord('d'):  # D key for moving right
+            elif (key == ord('d') or key == curses.KEY_RIGHT):  # D key for moving right
                 current_column = min(current_column + 1, len(menu_options[0]) - 1)
-            elif key == ord('\n') or key == ord(' '):
+            elif (key == ord('\n') or key == ord(' ')):
                 # Perform some action based on the selected option
                 selected_option = menu_options[current_row][current_column]
 
@@ -207,19 +207,21 @@ def main(stdscr):
                 if(selected_option == "Select Rich Presence"):
                     state = STATE_SELECT_RICH_PRESENCE
         elif(state == STATE_SELECT_RICH_PRESENCE):
-            if key == ord('z'):
+            if (key == ord('z') or key == curses.KEY_UP):
                 current_row_select_rich_presence = max(current_row_select_rich_presence - 1, 0)
-            elif key == ord('s'):
+            elif (key == ord('s') or key == curses.KEY_DOWN):
                 current_row_select_rich_presence = min(current_row_select_rich_presence + 1, len(list(settings_data.keys())) - 1)
-            elif key == ord('\n') or key == ord(' '):
+            elif (key == ord('\n') or key == ord(' ')):
                 selected_template_rpc = list(settings_data.keys())[current_row_select_rich_presence]
                 # Now switch to a new state where you can handle the selected template/RPC
                 state = STATE_SELECT_RICH_PRESENCE
         elif(state == STATE_HELP):
-            if key == ord('\n') or key == ord(' '):
+            if (key == ord('\n') or key == ord(' ')):
                 state = STATE_MAIN_MENU
 
         if key == 27:
+            if(state == STATE_MAIN_MENU):
+                exit()
             state = STATE_MAIN_MENU
 
         stdscr.refresh()
