@@ -1,7 +1,7 @@
 {
-    "1": {
+    "TEMPLATE": {
         "ClientID": "",
-        "LargeImage": "", 
+        "LargeImage": "",
         "LargeImageText": "",
         "SmallImage": "",
         "SmallImageText": "",
@@ -11,5 +11,5 @@
         "Url2": "",
         "State": "",
         "Details": ""
-    }    
+    }
 }

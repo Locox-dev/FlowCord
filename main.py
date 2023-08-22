@@ -2,7 +2,7 @@ import curses
 import webbrowser
 from creator import *
 import time
-
+import json
 
 
 # Define the states
@@ -52,20 +52,42 @@ def displayHelp(stdscr, menu_options):
     stdscr.addstr(0, 0, "VERY LONG TEXT HERE")
     stdscr.addstr(10, 10, f"> {menu_options[0][0]}", curses.color_pair(1) | curses.A_BOLD)
 
-def displayCreateRichPresence(stdscr): # Always need to add something after an input or else it will all reset idk why
-
+def displayCreateRichPresence(stdscr, settings_data): # Always need to add something after an input or else it will all reset idk why
     global state
-
-    clientID = rawInput(stdscr, 1, 0, "Client ID:") 
-    if(len(clientID.decode()) >= 17):
-        stdscr.addstr(2, 0, "> " + clientID.decode() + " saved!")
-        largeImageText = rawInput(stdscr, 3, 0, "Large Image Text:")
-        if(largeImageText != ""):
-            stdscr.addstr(4, 0, "> " + largeImageText.decode() + " saved!")
-            smallImageText = rawInput(stdscr, 5, 0, "Small Image Text:")
-    else:
-        err = rawInput(stdscr, 3, 0, "PLEASE ENTER A CORRECT CLIENT ID. \n  PRESS ENTER TO RETURN BACK TO MAIN MENU.")
-        state = STATE_MAIN_MENU
+    
+    richPresenceName = rawInput(stdscr, 1, 0, "Name:")
+    if(richPresenceName.decode() != ""):
+        stdscr.addstr(2, 0, "> " + richPresenceName.decode() + " saved!")
+        clientID = rawInput(stdscr, 3, 0, "Client ID:") 
+        if(len(clientID.decode()) >= 17):
+            stdscr.addstr(4, 0, "> " + clientID.decode() + " saved!")
+            largeImageText = rawInput(stdscr, 5, 0, "Large Image Text:")
+            if(largeImageText != ""):
+                stdscr.addstr(6, 0, "> " + largeImageText.decode() + " saved!")
+                
+                
+                settings_data[richPresenceName.decode()] = {  # Crée une nouvelle entrée avec le numéro trouvé
+                    "ClientID": clientID.decode(),
+                    "LargeImage": "large",
+                    "LargeImageText": largeImageText.decode(),
+                    "SmallImage": "",
+                    "SmallImageText": "",
+                    "Button1": "",
+                    "Url1": "",
+                    "Button2": "",
+                    "Url2": "",
+                    "State": "",
+                    "Details": ""
+                }
+                
+                # Enregistrez les données mises à jour dans le fichier JSON
+                with open("settings.json", "w") as json_file:
+                    json.dump(settings_data, json_file, indent=4)
+                    
+                smallImageText = rawInput(stdscr, 7, 0, "Small Image Text:")
+        else:
+            err = rawInput(stdscr, 3, 0, "PLEASE ENTER A CORRECT CLIENT ID. \n  PRESS ENTER TO RETURN BACK TO MAIN MENU.")
+            state = STATE_MAIN_MENU
 
 
 def githubPage():
@@ -98,10 +120,13 @@ def main(stdscr):
     ]
     current_column = 0
     current_row = 0
-
+    
     back_button = [
         ["Back (Escape)"]
     ]
+    
+    with open("settings.json", "r") as json_file:
+        settings_data = json.load(json_file)
 
     while True:
         stdscr.clear()
@@ -111,7 +136,7 @@ def main(stdscr):
         elif(state == STATE_HELP):
             displayHelp(stdscr, back_button)
         elif(state == STATE_CREATE_RICH_PRESENCE):
-            displayCreateRichPresence(stdscr)
+            displayCreateRichPresence(stdscr, settings_data)
 
 
 
