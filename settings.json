@@ -37,5 +37,18 @@
         "Url2": "",
         "State": "Hello",
         "Details": "Hello"
+    },
+    "Coucou": {
+        "ClientID": "1143655197235744829",
+        "LargeImage": "large",
+        "LargeImageText": "t",
+        "SmallImage": "small",
+        "SmallImageText": "t",
+        "Button1": "coucou",
+        "Url1": "https://google.com",
+        "Button2": "",
+        "Url2": "",
+        "State": "Test",
+        "Details": "Test2"
     }
 }
