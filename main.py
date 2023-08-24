@@ -65,15 +65,27 @@ def displayCreateRichPresence(stdscr, settings_data): # Always need to add somet
     if(tutorial.decode().lower() == "y" or tutorial.decode().lower() == "yes"):
         createrpc_thread = threading.Thread(target=createInstructions)
         createrpc_thread.start()
+    if(tutorial.decode() == "exit()"):
+        state = STATE_MAIN_MENU
+        return
     richPresenceName = rawInput(stdscr, 5, 0, "Name:")
+    if(richPresenceName.decode() == "exit()"):
+        state = STATE_MAIN_MENU
+        return
     if(richPresenceName.decode() != ""):
         stdscr.addstr(6, 0, "> " + richPresenceName.decode() + " saved!")
         
         clientID = rawInput(stdscr, 7, 0, "Client ID (*):") 
+        if(clientID.decode() == "exit()"):
+            state = STATE_MAIN_MENU
+            return
         if(len(clientID.decode()) >= 17):
             stdscr.addstr(8, 0, "> " + clientID.decode() + " saved!")
             
             largeImageName = rawInput(stdscr, 9, 0, "Large Image Name (default: large):")
+            if(largeImageName.decode() == "exit()"):
+                state = STATE_MAIN_MENU
+                return
             largeImageNameReal = ""
             if(largeImageName.decode() == ""):
                 largeImageNameReal = "large"
@@ -82,12 +94,18 @@ def displayCreateRichPresence(stdscr, settings_data): # Always need to add somet
             stdscr.addstr(10, 0, "> " + largeImageNameReal + " saved!")
                 
             largeImageText = rawInput(stdscr, 11, 0, "Large Image Text:")
+            if(largeImageText.decode() == "exit()"):
+                state = STATE_MAIN_MENU
+                return
             if(largeImageText.decode() != "" and len(largeImageText.decode()) < 2):
                 err = rawInput(stdscr, 12, 0, "Large Image Text should be at least 2 character long or none. \n  PRESS ENTER TO RETURN BACK TO MAIN MENU.")
                 state = STATE_MAIN_MENU
             stdscr.addstr(12, 0, "> " + largeImageText.decode() + " saved!")
             
             smallImageName = rawInput(stdscr, 13, 0, "Small Image Name (default: small):")
+            if(smallImageName.decode() == "exit()"):
+                state = STATE_MAIN_MENU
+                return
             smallImageNameReal = ""
             if(smallImageName.decode() == ""):
                 smallImageNameReal = "small"
@@ -96,27 +114,48 @@ def displayCreateRichPresence(stdscr, settings_data): # Always need to add somet
             stdscr.addstr(14, 0, "> " + smallImageNameReal + " saved!")
             
             smallImageText = rawInput(stdscr, 15, 0, "Small Image Text:")
+            if(smallImageText.decode() == "exit()"):
+                state = STATE_MAIN_MENU
+                return
             if(smallImageText.decode() != "" and len(smallImageText.decode()) < 2):
                 err = rawInput(stdscr, 16, 0, "Small Image Text should be at least 2 character long or none. \n  PRESS ENTER TO RETURN BACK TO MAIN MENU.")
                 state = STATE_MAIN_MENU
             stdscr.addstr(16, 0, "> " + smallImageText.decode() + " saved!")
             
             button1Name = rawInput(stdscr, 17, 0, "Button 1 Name:")
+            if(button1Name.decode() == "exit()"):
+                state = STATE_MAIN_MENU
+                return
             stdscr.addstr(18, 0, "> " + button1Name.decode() + " saved!")
             
             button1URL = rawInput(stdscr, 19, 0, "Button 1 URL:")
+            if(button1URL.decode() == "exit()"):
+                state = STATE_MAIN_MENU
+                return
             stdscr.addstr(20, 0, "> " + button1URL.decode() + " saved!")
             
             button2Name = rawInput(stdscr, 21, 0, "Button 2 Name:")
+            if(button2Name.decode() == "exit()"):
+                state = STATE_MAIN_MENU
+                return
             stdscr.addstr(22, 0, "> " + button2Name.decode() + " saved!")
             
             button2URL = rawInput(stdscr, 23, 0, "Button 2 URL:")
+            if(button2URL.decode() == "exit()"):
+                state = STATE_MAIN_MENU
+                return
             stdscr.addstr(24, 0, "> " + button2URL.decode() + " saved!")
             
             stateRPC = rawInput(stdscr, 25, 0, "State:")
+            if(stateRPC.decode() == "exit()"):
+                state = STATE_MAIN_MENU
+                return
             stdscr.addstr(26, 0, "> " + stateRPC.decode() + " saved!")
             
             details = rawInput(stdscr, 27, 0, "Details:")
+            if(details.decode() == "exit()"):
+                state = STATE_MAIN_MENU
+                return
             stdscr.addstr(28, 0, "> " + details.decode() + " saved!")
             
             saver = rawInput(stdscr, 29, 0, "PRESS ENTER TO SAVE")
@@ -192,6 +231,7 @@ def main(stdscr):
     stdscr.nodelay(1)   # Make getch() non-blocking
     curses.start_color()  # Enable color support
     curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)  # Define a color pair (1)
+    curses.init_pair(2, curses.COLOR_CYAN, curses.COLOR_BLACK)  # Define a color pair (1)
 
     # Create some UI elements
     ascii_title = read_ascii_title()
@@ -224,7 +264,7 @@ def main(stdscr):
             displaySelectRichPresence(stdscr, settings_data, current_row_select_rich_presence)
 
         if(richPresence == True):
-            stdscr.addstr(0, 0, richPresenceName + " running.")
+            stdscr.addstr(0, 0, richPresenceName + " running.", curses.color_pair(2))
 
 
         # Get user input
