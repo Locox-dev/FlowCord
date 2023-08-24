@@ -12,6 +12,7 @@ STATE_MAIN_MENU = 0
 STATE_HELP = 1
 STATE_CREATE_RICH_PRESENCE = 2
 STATE_SELECT_RICH_PRESENCE = 3
+STATE_DELETE_RICH_PRESENCE = 4
 
 state = STATE_MAIN_MENU  # Initial state
 richPresence = False
@@ -201,6 +202,21 @@ def displaySelectRichPresence(stdscr, settings_data, current_selection):
             stdscr.addstr(i + 2, 0, f"  {option}")
 
     stdscr.refresh()
+    
+def displayDeleteRichPresence(stdscr, settings_data, current_selection, deleteVerification):
+    stdscr.addstr(0, 0, "Delete Rich Presence: \nPress enter to delete twice to delete the selected one.")
+    options = list(settings_data.keys())  # Get the keys (template/RPC names) from settings_data
+
+    for i, option in enumerate(options):
+        if i == current_selection:
+            stdscr.addstr(i + 3, 0, f"> {option}", curses.color_pair(1) | curses.A_BOLD)
+        else:
+            stdscr.addstr(i + 3, 0, f"  {option}")
+            
+    if(deleteVerification == True):
+        stdscr.addstr(current_selection + 3, len(list(settings_data.keys())[current_selection]) + 5, "Press again to delete.", curses.color_pair(3))
+
+    stdscr.refresh()
 
 
 def githubPage():
@@ -231,7 +247,8 @@ def main(stdscr):
     stdscr.nodelay(1)   # Make getch() non-blocking
     curses.start_color()  # Enable color support
     curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)  # Define a color pair (1)
-    curses.init_pair(2, curses.COLOR_CYAN, curses.COLOR_BLACK)  # Define a color pair (1)
+    curses.init_pair(2, curses.COLOR_CYAN, curses.COLOR_BLACK)  # Define a color pair (2)
+    curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLACK)  # Define a color pair (3)
 
     # Create some UI elements
     ascii_title = read_ascii_title()
@@ -243,6 +260,12 @@ def main(stdscr):
     current_column = 0
     current_row = 0
     current_row_select_rich_presence = 0
+    current_row_delete_rich_presence = 0
+    
+    deleteVerification = False
+    deleteVerificationRow = 10
+    deleteVerificationColumn = 0
+    deleteVerificationShow = False
     
     back_button = [
         ["Back (Escape)"]
@@ -262,10 +285,12 @@ def main(stdscr):
             displayCreateRichPresence(stdscr, settings_data)
         elif(state == STATE_SELECT_RICH_PRESENCE):
             displaySelectRichPresence(stdscr, settings_data, current_row_select_rich_presence)
+        elif(state == STATE_DELETE_RICH_PRESENCE):
+            displayDeleteRichPresence(stdscr, settings_data, current_row_delete_rich_presence, deleteVerification)
 
         if(richPresence == True):
             stdscr.addstr(0, 0, richPresenceName + " running.", curses.color_pair(2))
-
+            
 
         # Get user input
         key = stdscr.getch()
@@ -292,6 +317,9 @@ def main(stdscr):
                     state = STATE_CREATE_RICH_PRESENCE
                 if(selected_option == "Select Rich Presence"):
                     state = STATE_SELECT_RICH_PRESENCE
+                if(selected_option == "Delete Rich Presence"):
+                    state = STATE_DELETE_RICH_PRESENCE
+                    deleteVerification = False
         elif(state == STATE_SELECT_RICH_PRESENCE):
             if (key == ord('z') or key == curses.KEY_UP):
                 current_row_select_rich_presence = max(current_row_select_rich_presence - 1, 0)
@@ -306,8 +334,25 @@ def main(stdscr):
                 state = STATE_MAIN_MENU
                 richPresence = True
                 richPresenceName = selected
-                # Now switch to a new state where you can handle the selected template/RPC
-                #state = STATE_SELECT_RICH_PRESENCE
+        elif(state == STATE_DELETE_RICH_PRESENCE):
+            if (key == ord('z') or key == curses.KEY_UP):
+                current_row_delete_rich_presence = max(current_row_delete_rich_presence - 1, 0)
+                deleteVerification = False
+            elif (key == ord('s') or key == curses.KEY_DOWN):
+                current_row_delete_rich_presence = min(current_row_delete_rich_presence + 1, len(list(settings_data.keys())) - 1)
+                deleteVerification = False
+            elif (key == ord('\n') or key == ord(' ')):
+                selected = list(settings_data.keys())[current_row_delete_rich_presence]
+                if(deleteVerification == False):
+                    deleteVerification = True
+                else:
+                    if(selected in settings_data):
+                        del settings_data[selected]
+
+                    with open('settings.json', 'w') as json_file:
+                        json.dump(settings_data, json_file, indent=4)
+                        
+                    deleteVerification = False
         elif(state == STATE_HELP):
             if (key == ord('\n') or key == ord(' ')):
                 state = STATE_MAIN_MENU
