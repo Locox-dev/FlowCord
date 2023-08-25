@@ -5,6 +5,7 @@ from creator import *
 import threading
 import json
 from os import system
+import os
 
 
 # Define the states
@@ -13,6 +14,7 @@ STATE_HELP = 1
 STATE_CREATE_RICH_PRESENCE = 2
 STATE_SELECT_RICH_PRESENCE = 3
 STATE_DELETE_RICH_PRESENCE = 4
+STATE_CREATE_CUSTOM_CSS = 5
 
 state = STATE_MAIN_MENU  # Initial state
 richPresence = False
@@ -176,7 +178,7 @@ def displayCreateRichPresence(stdscr, settings_data): # Always need to add somet
             }
             
             # Enregistrez les données mises à jour dans le fichier JSON
-            with open("settings.json", "w") as json_file:
+            with open("richpresence.json", "w") as json_file:
                 json.dump(settings_data, json_file, indent=4)
             
             validation = rawInput(stdscr, 30, 0, "SAVE DONE, PRESS ENTER TO GO BACK TO THE MAIN MENU")
@@ -217,6 +219,39 @@ def displayDeleteRichPresence(stdscr, settings_data, current_selection, deleteVe
         stdscr.addstr(current_selection + 3, len(list(settings_data.keys())[current_selection]) + 5, "Press again to delete.", curses.color_pair(3))
 
     stdscr.refresh()
+    
+def displayCreateCustomCSS(stdscr):
+    global state
+    
+    # Read the existing JSON data from customcss.json
+    with open('customcss.json', 'r') as json_file:
+        customcss_data = json.load(json_file)
+    
+    stdscr.addstr(2, 0, "Press shift + ctrl + v to paste things. (*) mean this field is mandatory.")
+    name = rawInput(stdscr, 3, 0, "Custom CSS name: ")
+    
+    if(name.decode() == "exit()"):
+        state = STATE_MAIN_MENU
+        return
+    
+    if(name.decode() in customcss_data):
+        stdscr.addstr(4, 0, f"Custom CSS name '{name.decode()}' already exists!")
+    else:
+        filename = name.decode().replace(" ", "_").lower() + ".css"
+        
+        customcss_data[name.decode()] = filename
+        with open('customcss.json', 'w') as json_file:
+            json.dump(customcss_data, json_file, indent=4)
+            
+        # Create the CustomsCSS directory if it doesn't exist
+        os.makedirs('CustomsCSS', exist_ok=True)
+            
+        css_file_path = f"CustomsCSS/{filename}"
+        with open(css_file_path, 'w') as css_file:
+            css_file.write("/* Your Custom CSS content here */")
+            
+        stdscr.addstr(5, 0, f"Opening '{filename}'...")
+    
 
 
 def githubPage():
@@ -255,7 +290,9 @@ def main(stdscr):
     menu_options = [
         ["Help", "Github Page", "Donate"],
         ["Create Rich Presence", "Select Rich Presence", "Delete Rich Presence"],
-        ["Option 7", "Option 8", "Option 9"]
+        ["Create Custom CSS", "Select Custom CSS", "Delete Custom CSS"] 
+        # Create custom css = open text file in IDE and when saved it will be cloned into the discord-custom.css file
+        # Create custom css = open text file in IDE and when saved it will be cloned into the discord-custom.css file
     ]
     current_column = 0
     current_row = 0
@@ -271,7 +308,7 @@ def main(stdscr):
         ["Back (Escape)"]
     ]
     
-    with open("settings.json", "r") as json_file:
+    with open("richpresence.json", "r") as json_file:
         settings_data = json.load(json_file)
 
     while True:
@@ -287,6 +324,8 @@ def main(stdscr):
             displaySelectRichPresence(stdscr, settings_data, current_row_select_rich_presence)
         elif(state == STATE_DELETE_RICH_PRESENCE):
             displayDeleteRichPresence(stdscr, settings_data, current_row_delete_rich_presence, deleteVerification)
+        elif(state == STATE_CREATE_CUSTOM_CSS):
+            displayCreateCustomCSS(stdscr)
 
         if(richPresence == True):
             stdscr.addstr(0, 0, richPresenceName + " running.", curses.color_pair(2))
@@ -320,6 +359,8 @@ def main(stdscr):
                 if(selected_option == "Delete Rich Presence"):
                     state = STATE_DELETE_RICH_PRESENCE
                     deleteVerification = False
+                if(selected_option == "Create Custom CSS"):
+                    state = STATE_CREATE_CUSTOM_CSS
         elif(state == STATE_SELECT_RICH_PRESENCE):
             if (key == ord('z') or key == curses.KEY_UP):
                 current_row_select_rich_presence = max(current_row_select_rich_presence - 1, 0)
@@ -349,7 +390,7 @@ def main(stdscr):
                     if(selected in settings_data):
                         del settings_data[selected]
 
-                    with open('settings.json', 'w') as json_file:
+                    with open('richpresence.json', 'w') as json_file:
                         json.dump(settings_data, json_file, indent=4)
                         
                     deleteVerification = False
