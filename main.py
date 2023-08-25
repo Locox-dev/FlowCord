@@ -16,6 +16,7 @@ STATE_CREATE_RICH_PRESENCE = 2
 STATE_SELECT_RICH_PRESENCE = 3
 STATE_DELETE_RICH_PRESENCE = 4
 STATE_CREATE_CUSTOM_CSS = 5
+STATE_SELECT_CUSTOM_CSS = 6
 
 state = STATE_MAIN_MENU  # Initial state
 richPresence = False
@@ -61,7 +62,7 @@ def displayHelp(stdscr, menu_options):
     stdscr.addstr(0, 0, "VERY LONG TEXT HERE")
     stdscr.addstr(10, 10, f"> {menu_options[0][0]}", curses.color_pair(1) | curses.A_BOLD)
 
-def displayCreateRichPresence(stdscr, settings_data): # Always need to add something after an input or else it will all reset idk why
+def displayCreateRichPresence(stdscr, richpresence_data): # Always need to add something after an input or else it will all reset idk why
     global state
     
     stdscr.addstr(2, 0, "Press shift + ctrl + v to paste things. (*) mean this field is mandatory.")
@@ -164,7 +165,7 @@ def displayCreateRichPresence(stdscr, settings_data): # Always need to add somet
             
             saver = rawInput(stdscr, 29, 0, "PRESS ENTER TO SAVE")
                         
-            settings_data[richPresenceName.decode()] = {  # Crée une nouvelle entrée avec le numéro trouvé
+            richpresence_data[richPresenceName.decode()] = {  # Crée une nouvelle entrée avec le numéro trouvé
                 "ClientID": clientID.decode(),
                 "LargeImage": largeImageNameReal,
                 "LargeImageText": largeImageText.decode(),
@@ -180,7 +181,7 @@ def displayCreateRichPresence(stdscr, settings_data): # Always need to add somet
             
             # Enregistrez les données mises à jour dans le fichier JSON
             with open("richpresence.json", "w") as json_file:
-                json.dump(settings_data, json_file, indent=4)
+                json.dump(richpresence_data, json_file, indent=4)
             
             validation = rawInput(stdscr, 30, 0, "SAVE DONE, PRESS ENTER TO GO BACK TO THE MAIN MENU")
             state = STATE_MAIN_MENU
@@ -194,9 +195,9 @@ def displayCreateRichPresence(stdscr, settings_data): # Always need to add somet
         err = rawInput(stdscr, 6, 0, "PLEASE ENTER A CORRECT NAME, AT LEAST ONE CHARACTER LONG. \n  PRESS ENTER TO RETURN BACK TO MAIN MENU")
         state = STATE_MAIN_MENU
 
-def displaySelectRichPresence(stdscr, settings_data, current_selection):
+def displaySelectRichPresence(stdscr, richpresence_data, current_selection):
     stdscr.addstr(0, 0, "Select Rich Presence:")
-    options = list(settings_data.keys())  # Get the keys (template/RPC names) from settings_data
+    options = list(richpresence_data.keys())  # Get the keys (template/RPC names) from richpresence_data
 
     for i, option in enumerate(options):
         if i == current_selection:
@@ -206,9 +207,9 @@ def displaySelectRichPresence(stdscr, settings_data, current_selection):
 
     stdscr.refresh()
     
-def displayDeleteRichPresence(stdscr, settings_data, current_selection, deleteVerification):
+def displayDeleteRichPresence(stdscr, richpresence_data, current_selection, deleteVerification):
     stdscr.addstr(0, 0, "Delete Rich Presence: \nPress enter to delete twice to delete the selected one.")
-    options = list(settings_data.keys())  # Get the keys (template/RPC names) from settings_data
+    options = list(richpresence_data.keys())  # Get the keys (template/RPC names) from richpresence_data
 
     for i, option in enumerate(options):
         if i == current_selection:
@@ -217,7 +218,7 @@ def displayDeleteRichPresence(stdscr, settings_data, current_selection, deleteVe
             stdscr.addstr(i + 3, 0, f"  {option}")
             
     if(deleteVerification == True):
-        stdscr.addstr(current_selection + 3, len(list(settings_data.keys())[current_selection]) + 5, "Press again to delete.", curses.color_pair(3))
+        stdscr.addstr(current_selection + 3, len(list(richpresence_data.keys())[current_selection]) + 5, "Press again to delete.", curses.color_pair(3))
 
     stdscr.refresh()
     
@@ -260,6 +261,9 @@ def displayCreateCustomCSS(stdscr):
         rawInput(stdscr, 7, 0, f"Press enter to save your custom CSS.")
         validation = rawInput(stdscr, 9, 0, f"You can still modify it by going here {css_file_path}. Press enter to finish.")
         state = STATE_MAIN_MENU
+        
+def displaySelectCustomCSS():
+    global state
 
 def githubPage():
     webbrowser.open('https://github.com/Locox-dev/FlowCord')
@@ -305,9 +309,7 @@ def main(stdscr):
     menu_options = [
         ["Help", "Github Page", "Donate"],
         ["Create Rich Presence", "Select Rich Presence", "Delete Rich Presence"],
-        ["Create Custom CSS", "Select Custom CSS", "Delete Custom CSS"] 
-        # Create custom css = open text file in IDE and when saved it will be cloned into the discord-custom.css file
-        # Create custom css = open text file in IDE and when saved it will be cloned into the discord-custom.css file
+        ["Create Custom CSS", "Select Custom CSS", "Delete Custom CSS"]
     ]
     current_column = 0
     current_row = 0
@@ -324,7 +326,7 @@ def main(stdscr):
     ]
     
     with open("richpresence.json", "r") as json_file:
-        settings_data = json.load(json_file)
+        richpresence_data = json.load(json_file)
 
     while True:
         stdscr.clear()
@@ -334,13 +336,15 @@ def main(stdscr):
         elif(state == STATE_HELP):
             displayHelp(stdscr, back_button)
         elif(state == STATE_CREATE_RICH_PRESENCE):
-            displayCreateRichPresence(stdscr, settings_data)
+            displayCreateRichPresence(stdscr, richpresence_data)
         elif(state == STATE_SELECT_RICH_PRESENCE):
-            displaySelectRichPresence(stdscr, settings_data, current_row_select_rich_presence)
+            displaySelectRichPresence(stdscr, richpresence_data, current_row_select_rich_presence)
         elif(state == STATE_DELETE_RICH_PRESENCE):
-            displayDeleteRichPresence(stdscr, settings_data, current_row_delete_rich_presence, deleteVerification)
+            displayDeleteRichPresence(stdscr, richpresence_data, current_row_delete_rich_presence, deleteVerification)
         elif(state == STATE_CREATE_CUSTOM_CSS):
             displayCreateCustomCSS(stdscr)
+        elif(state == STATE_SELECT_CUSTOM_CSS):
+            displaySelectCustomCSS(stdscr)
 
         if(richPresence == True):
             stdscr.addstr(0, 0, richPresenceName + " running.", curses.color_pair(2))
@@ -376,13 +380,15 @@ def main(stdscr):
                     deleteVerification = False
                 if(selected_option == "Create Custom CSS"):
                     state = STATE_CREATE_CUSTOM_CSS
+                if(selected_option == "Select Custom CSS"):
+                    state = STATE_SELECT_CUSTOM_CSS
         elif(state == STATE_SELECT_RICH_PRESENCE):
             if (key == ord('z') or key == curses.KEY_UP):
                 current_row_select_rich_presence = max(current_row_select_rich_presence - 1, 0)
             elif (key == ord('s') or key == curses.KEY_DOWN):
-                current_row_select_rich_presence = min(current_row_select_rich_presence + 1, len(list(settings_data.keys())) - 1)
+                current_row_select_rich_presence = min(current_row_select_rich_presence + 1, len(list(richpresence_data.keys())) - 1)
             elif (key == ord('\n') or key == ord(' ')):
-                selected = list(settings_data.keys())[current_row_select_rich_presence]
+                selected = list(richpresence_data.keys())[current_row_select_rich_presence]
 
                 node_thread = threading.Thread(target=runRichPresence, args=(selected,))
                 node_thread.start()
@@ -395,18 +401,18 @@ def main(stdscr):
                 current_row_delete_rich_presence = max(current_row_delete_rich_presence - 1, 0)
                 deleteVerification = False
             elif (key == ord('s') or key == curses.KEY_DOWN):
-                current_row_delete_rich_presence = min(current_row_delete_rich_presence + 1, len(list(settings_data.keys())) - 1)
+                current_row_delete_rich_presence = min(current_row_delete_rich_presence + 1, len(list(richpresence_data.keys())) - 1)
                 deleteVerification = False
             elif (key == ord('\n') or key == ord(' ')):
-                selected = list(settings_data.keys())[current_row_delete_rich_presence]
+                selected = list(richpresence_data.keys())[current_row_delete_rich_presence]
                 if(deleteVerification == False):
                     deleteVerification = True
                 else:
-                    if(selected in settings_data):
-                        del settings_data[selected]
+                    if(selected in richpresence_data):
+                        del richpresence_data[selected]
 
                     with open('richpresence.json', 'w') as json_file:
-                        json.dump(settings_data, json_file, indent=4)
+                        json.dump(richpresence_data, json_file, indent=4)
                         
                     deleteVerification = False
         elif(state == STATE_HELP):

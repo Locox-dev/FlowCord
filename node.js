@@ -1,6 +1,6 @@
 const rpc = require("discord-rpc");
 const client = new rpc.Client({ transport: 'ipc' });
-const config = require('./settings.json');
+const config = require('./richpresence.json');
 
 var selectedConfigName = ""
 process.argv.forEach(function (val, index, array) {
