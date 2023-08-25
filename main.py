@@ -251,7 +251,7 @@ def displayCreateCustomCSS(stdscr):
             
         css_file_path = os.path.abspath(f"CustomsCSS/{filename}")
         with open(css_file_path, 'w') as css_file:
-            css_file.write("/* Your Custom CSS content here */")
+            css_file.write("/* Your Custom CSS content here */\n/* You can also find CSS files here: https://vsthemes.org/en/skins/discord/ and here: https://bdeditor.dev/. Copy the text into the corresponding custom css file. */")
             
         time.sleep(2) # Wait to be sure of the file creation
         
@@ -262,8 +262,20 @@ def displayCreateCustomCSS(stdscr):
         validation = rawInput(stdscr, 9, 0, f"You can still modify it by going here {css_file_path}. Press enter to finish.")
         state = STATE_MAIN_MENU
         
-def displaySelectCustomCSS():
+def displaySelectCustomCSS(stdscr, current_selection):
     global state
+    
+    with open('customcss.json', 'r') as json_file:
+        customcss_data = json.load(json_file)
+        
+    customs_css = list(customcss_data.keys())
+    
+    for i, custom_css in enumerate(customs_css):
+        if i == current_selection:
+            stdscr.addstr(i + 2, 0, f"> {custom_css}", curses.color_pair(1) | curses.A_BOLD)
+        else:
+            stdscr.addstr(i + 2, 0, f"  {custom_css}")
+
 
 def githubPage():
     webbrowser.open('https://github.com/Locox-dev/FlowCord')
@@ -315,11 +327,9 @@ def main(stdscr):
     current_row = 0
     current_row_select_rich_presence = 0
     current_row_delete_rich_presence = 0
+    current_row_select_custom_css = 0
     
     deleteVerification = False
-    deleteVerificationRow = 10
-    deleteVerificationColumn = 0
-    deleteVerificationShow = False
     
     back_button = [
         ["Back (Escape)"]
@@ -344,7 +354,7 @@ def main(stdscr):
         elif(state == STATE_CREATE_CUSTOM_CSS):
             displayCreateCustomCSS(stdscr)
         elif(state == STATE_SELECT_CUSTOM_CSS):
-            displaySelectCustomCSS(stdscr)
+            displaySelectCustomCSS(stdscr, current_row_select_custom_css)
 
         if(richPresence == True):
             stdscr.addstr(0, 0, richPresenceName + " running.", curses.color_pair(2))
@@ -415,6 +425,14 @@ def main(stdscr):
                         json.dump(richpresence_data, json_file, indent=4)
                         
                     deleteVerification = False
+        elif(state == STATE_SELECT_CUSTOM_CSS):
+            if (key == ord('z') or key == curses.KEY_UP):
+                current_row_select_custom_css = max(current_row_select_custom_css - 1, 0)
+            elif (key == ord('s') or key == curses.KEY_DOWN):
+                current_row_select_custom_css = min(current_row_select_custom_css + 1, len(list(richpresence_data.keys())) - 1)
+            elif (key == ord('\n') or key == ord(' ')):
+                selected = list(richpresence_data.keys())[current_row_select_custom_css]
+                state = STATE_MAIN_MENU
         elif(state == STATE_HELP):
             if (key == ord('\n') or key == ord(' ')):
                 state = STATE_MAIN_MENU
