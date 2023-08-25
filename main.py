@@ -6,6 +6,7 @@ import threading
 import json
 from os import system
 import os
+import sys
 
 
 # Define the states
@@ -238,6 +239,7 @@ def displayCreateCustomCSS(stdscr):
         stdscr.addstr(4, 0, f"Custom CSS name '{name.decode()}' already exists!")
     else:
         filename = name.decode().replace(" ", "_").lower() + ".css"
+        stdscr.addstr(5, 0, f"Creating '{filename}'...")
         
         customcss_data[name.decode()] = filename
         with open('customcss.json', 'w') as json_file:
@@ -246,13 +248,18 @@ def displayCreateCustomCSS(stdscr):
         # Create the CustomsCSS directory if it doesn't exist
         os.makedirs('CustomsCSS', exist_ok=True)
             
-        css_file_path = f"CustomsCSS/{filename}"
+        css_file_path = os.path.abspath(f"CustomsCSS/{filename}")
         with open(css_file_path, 'w') as css_file:
             css_file.write("/* Your Custom CSS content here */")
             
-        stdscr.addstr(5, 0, f"Opening '{filename}'...")
-    
-
+        time.sleep(2) # Wait to be sure of the file creation
+        
+        stdscr.addstr(6, 0, f"Opening '{filename}'...")
+        openDefaultEditor(css_file_path)
+        
+        rawInput(stdscr, 7, 0, f"Press enter to save your custom CSS.")
+        validation = rawInput(stdscr, 9, 0, f"You can still modify it by going here {css_file_path}. Press enter to finish.")
+        state = STATE_MAIN_MENU
 
 def githubPage():
     webbrowser.open('https://github.com/Locox-dev/FlowCord')
@@ -264,6 +271,14 @@ def rawInput(stdscr, r, c, prompt_string):
     stdscr.refresh()
     input = stdscr.getstr(r + 1, c + 2, 20)
     return input
+
+def openDefaultEditor(file_path):
+    if sys.platform == "win32":
+        os.startfile(file_path)
+    elif sys.platform == "darwin":
+        subprocess.run(["open", file_path])
+    elif sys.platform.startswith("linux"):
+        subprocess.run(["xdg-open", file_path])
 
 def runRichPresence(selected):
     node_cmd = ["node", "node.js", selected]
