@@ -6,6 +6,7 @@ import subprocess
 import psutil
 import sys
 from asar import *
+import json
 
 class DiscordProcess:
     def __init__(self, path, exe):
@@ -153,8 +154,9 @@ Discord will close and then be relaunched when the tool completes.
 CSS files must have the ".css" extension.
 """
     parser = argparse.ArgumentParser(description=description.strip())
-    parser.add_argument('--css', metavar='file_or_dir', help='Location of the file or directory to watch')
     parser.add_argument('--revert', action='store_true', help='Reverts any changes made to Discord (does not delete CSS)')
+    parser.add_argument('--file', metavar='file_or_dir', help='Location of the CSS file to copy into the discord custom css file')
+    parser.add_argument('--default', help='Set the Discord CSS to default (does not change Discord to his default state)')
     args = parser.parse_args()
     return args
 
@@ -231,6 +233,34 @@ def allow_https():
 
         f.seek(0, 0)
         f.write(bypass_csp + '\n' + content)
+        
+def cssTransmutation(css_file_path):
+    with open("config.json", "r") as json_file:
+        config_data = json.load(json_file)
+        
+    if(not config_data["custom-css-initiated"]):
+        print("You must initiate the discord custom css first by launching the script without any arugments.")
+        return
+    
+    custom_css_file = config_data["custom-css-file"]
+
+    if os.path.exists(custom_css_file):
+        
+        if(css_file_path == ""):
+            with open(custom_css_file, "w") as existing_css_file:
+                # HERE NEED TO SET THE FILE TO AN EMPTY FILE
+                print("")
+        else:
+            with open(css_file_path, "r") as new_css_file:
+                new_css_content = new_css_file.read()
+
+            with open(custom_css_file, "w") as existing_css_file:
+                existing_css_file.write(new_css_content) # HERE NEED TO SET THE CONTENT NOT TO WRITE IN (ELSE IT WILL ADD TO THE LAST CONTENT)
+                
+            print("Custom CSS has been updated.")
+    else:
+        print(f"Custom CSS file '{custom_css_file}' not found.")
+    
 
 def main():
     args = parse_args()
@@ -239,24 +269,36 @@ def main():
     except Exception as e:
         print(str(e))
         return
+    
+    if args.file:
+        args.file = os.path.abspath(args.file)
+        cssTransmutation(args.file)
+        return
+    
+    if args.default:
+        cssTransmutation("")
+        return
 
-    if args.css:
-        args.css = os.path.abspath(args.css)
-    else:
-        args.css = os.path.join(discord.script_path, 'discord-custom.css')
+    discordCustomCSS = os.path.join(discord.script_path, 'discord-custom.css')
 
     os.chdir(discord.script_path)
 
-    args.css = os.path.abspath(args.css)
+    discordCustomCSS = os.path.abspath(discordCustomCSS)
 
     discord.terminate()
 
     if args.revert:
         return revert_changes(discord)
 
-    if not os.path.exists(args.css):
-        with open(args.css, 'w', encoding='utf-8') as f:
+    if not os.path.exists(discordCustomCSS):
+        with open(discordCustomCSS, 'w', encoding='utf-8') as f:
             f.write('/* put your custom css here. */\n')
+        with open("config.json", "r") as json_file:
+            config_data = json.load(json_file)
+            config_data["custom-css-file"] = discordCustomCSS
+            config_data["custom-css-initiated"] = True
+        with open("config.json", "w") as json_file:
+            json.dump(config_data, json_file, indent=4)
 
     if not extract_asar():
         discord.launch()
@@ -352,7 +394,7 @@ def main():
 
         window.applyAndWatchCSS('%s');
         window.removeDuplicateCSS();
-    """ % args.css.replace('\\', '/'))
+    """ % discordCustomCSS.replace('\\', '/'))
 
 
     css_reload_script = textwrap.dedent("""\
@@ -434,7 +476,7 @@ def main():
 
     print(
         '\nDone!\n' +
-        '\nYou may now edit your %s file,\n' % os.path.abspath(args.css) +
+        '\nYou may now edit your %s file,\n' % os.path.abspath(discordCustomCSS) +
         "which will be reloaded whenever it's saved.\n" +
         '\nRelaunching Discord now...'
     )
@@ -442,5 +484,5 @@ def main():
     discord.launch()
 
 
-#if __name__ == '__main__':
-#    main()
+if __name__ == '__main__':
+    main()

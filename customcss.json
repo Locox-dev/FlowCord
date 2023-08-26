@@ -1,5 +1,3 @@
 {
-    "TEMPLATE": "template.css",
-    "test": "test.css",
-    "testtest": "testtest.css"
+    "TEMPLATE": "template.css"
 }

@@ -222,12 +222,8 @@ def displayDeleteRichPresence(stdscr, richpresence_data, current_selection, dele
 
     stdscr.refresh()
     
-def displayCreateCustomCSS(stdscr):
+def displayCreateCustomCSS(stdscr, customcss_data):
     global state
-    
-    # Read the existing JSON data from customcss.json
-    with open('customcss.json', 'r') as json_file:
-        customcss_data = json.load(json_file)
     
     stdscr.addstr(2, 0, "Press shift + ctrl + v to paste things. (*) mean this field is mandatory.")
     name = rawInput(stdscr, 3, 0, "Custom CSS name: ")
@@ -242,14 +238,14 @@ def displayCreateCustomCSS(stdscr):
         filename = name.decode().replace(" ", "_").lower() + ".css"
         stdscr.addstr(5, 0, f"Creating '{filename}'...")
         
-        customcss_data[name.decode()] = filename
-        with open('customcss.json', 'w') as json_file:
-            json.dump(customcss_data, json_file, indent=4)
-            
         # Create the CustomsCSS directory if it doesn't exist
         os.makedirs('CustomsCSS', exist_ok=True)
-            
+        
         css_file_path = os.path.abspath(f"CustomsCSS/{filename}")
+        customcss_data[name.decode()] = css_file_path
+        with open('customcss.json', 'w') as json_file:
+            json.dump(customcss_data, json_file, indent=4)
+        
         with open(css_file_path, 'w') as css_file:
             css_file.write("/* Your Custom CSS content here */\n/* You can also find CSS files here: https://vsthemes.org/en/skins/discord/ and here: https://bdeditor.dev/. Copy the text into the corresponding custom css file. */")
             
@@ -262,11 +258,8 @@ def displayCreateCustomCSS(stdscr):
         validation = rawInput(stdscr, 9, 0, f"You can still modify it by going here {css_file_path}. Press enter to finish.")
         state = STATE_MAIN_MENU
         
-def displaySelectCustomCSS(stdscr, current_selection):
+def displaySelectCustomCSS(stdscr, current_selection, customcss_data):
     global state
-    
-    with open('customcss.json', 'r') as json_file:
-        customcss_data = json.load(json_file)
         
     customs_css = list(customcss_data.keys())
     
@@ -299,6 +292,10 @@ def openDefaultEditor(file_path):
 def runRichPresence(selected):
     node_cmd = ["node", "node.js", selected]
     subprocess.run(node_cmd, text=True)
+    
+def setCustomCSS(selected, selected_css):
+    py_cmd = ["python", "customcss.py", "--css", selected_css]
+    subprocess.run(py_cmd, text=True, shell=True)
 
 def main(stdscr):
 
@@ -337,6 +334,9 @@ def main(stdscr):
     
     with open("richpresence.json", "r") as json_file:
         richpresence_data = json.load(json_file)
+        
+    with open('customcss.json', 'r') as json_file:
+        customcss_data = json.load(json_file)
 
     while True:
         stdscr.clear()
@@ -352,9 +352,9 @@ def main(stdscr):
         elif(state == STATE_DELETE_RICH_PRESENCE):
             displayDeleteRichPresence(stdscr, richpresence_data, current_row_delete_rich_presence, deleteVerification)
         elif(state == STATE_CREATE_CUSTOM_CSS):
-            displayCreateCustomCSS(stdscr)
+            displayCreateCustomCSS(stdscr, customcss_data)
         elif(state == STATE_SELECT_CUSTOM_CSS):
-            displaySelectCustomCSS(stdscr, current_row_select_custom_css)
+            displaySelectCustomCSS(stdscr, current_row_select_custom_css, customcss_data)
 
         if(richPresence == True):
             stdscr.addstr(0, 0, richPresenceName + " running.", curses.color_pair(2))
@@ -429,9 +429,11 @@ def main(stdscr):
             if (key == ord('z') or key == curses.KEY_UP):
                 current_row_select_custom_css = max(current_row_select_custom_css - 1, 0)
             elif (key == ord('s') or key == curses.KEY_DOWN):
-                current_row_select_custom_css = min(current_row_select_custom_css + 1, len(list(richpresence_data.keys())) - 1)
+                current_row_select_custom_css = min(current_row_select_custom_css + 1, len(list(customcss_data.keys())) - 1)
             elif (key == ord('\n') or key == ord(' ')):
-                selected = list(richpresence_data.keys())[current_row_select_custom_css]
+                selected = list(customcss_data.keys())[current_row_select_custom_css]
+                selected_css = customcss_data[selected]
+                setCustomCSS(selected, selected_css)
                 state = STATE_MAIN_MENU
         elif(state == STATE_HELP):
             if (key == ord('\n') or key == ord(' ')):
