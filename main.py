@@ -258,16 +258,22 @@ def displayCreateCustomCSS(stdscr, customcss_data):
         validation = rawInput(stdscr, 9, 0, f"You can still modify it by going here {css_file_path}. Press enter to finish.")
         state = STATE_MAIN_MENU
         
-def displaySelectCustomCSS(stdscr, current_selection, customcss_data):
+def displaySelectCustomCSS(stdscr, current_selection, customcss_data, config_data):
     global state
+
+    if(config_data["custom-css-initiated"] == False):
+        rawInput(stdscr, 0, 0, "Initating customs CSS files...")
+        initCustomCSS()
+        
+    stdscr.addstr(0, 0, "                                ")
         
     customs_css = list(customcss_data.keys())
     
     for i, custom_css in enumerate(customs_css):
         if i == current_selection:
-            stdscr.addstr(i + 2, 0, f"> {custom_css}", curses.color_pair(1) | curses.A_BOLD)
+            stdscr.addstr(i + 3, 0, f"> {custom_css}", curses.color_pair(1) | curses.A_BOLD)
         else:
-            stdscr.addstr(i + 2, 0, f"  {custom_css}")
+            stdscr.addstr(i + 3, 0, f"  {custom_css}")
 
 
 def githubPage():
@@ -293,9 +299,18 @@ def runRichPresence(selected):
     node_cmd = ["node", "node.js", selected]
     subprocess.run(node_cmd, text=True)
     
-def setCustomCSS(selected, selected_css):
-    py_cmd = ["python", "customcss.py", "--css", selected_css]
-    subprocess.run(py_cmd, text=True, shell=True)
+def setCustomCSS(selected_css):
+    py_cmd = ["python", "customcss.py", "--file", selected_css]
+    subprocess.run(py_cmd, text=True)
+
+def setDefaultCSS():
+    py_cmd = ["python", "customcss.py", "--default"]
+    subprocess.run(py_cmd, text=True)
+
+def initCustomCSS():
+    py_cmd = ["python", "customcss.py"]
+    subprocess.run(py_cmd, text=True)
+
 
 def main(stdscr):
 
@@ -303,7 +318,7 @@ def main(stdscr):
     global richPresence
     global richPresenceName
     
-    system('mode con: cols=120 lines=35') # Resize terminal window
+    #system('mode con: cols=120 lines=35') # Resize terminal window
 
     # Setup
     curses.curs_set(0)  # Hide the cursor
@@ -331,7 +346,10 @@ def main(stdscr):
     back_button = [
         ["Back (Escape)"]
     ]
-    
+
+    with open('config.json', 'r') as json_file:
+        config_data = json.load(json_file)
+
     with open("richpresence.json", "r") as json_file:
         richpresence_data = json.load(json_file)
         
@@ -354,7 +372,7 @@ def main(stdscr):
         elif(state == STATE_CREATE_CUSTOM_CSS):
             displayCreateCustomCSS(stdscr, customcss_data)
         elif(state == STATE_SELECT_CUSTOM_CSS):
-            displaySelectCustomCSS(stdscr, current_row_select_custom_css, customcss_data)
+            displaySelectCustomCSS(stdscr, current_row_select_custom_css, customcss_data, config_data)
 
         if(richPresence == True):
             stdscr.addstr(0, 0, richPresenceName + " running.", curses.color_pair(2))
@@ -433,7 +451,10 @@ def main(stdscr):
             elif (key == ord('\n') or key == ord(' ')):
                 selected = list(customcss_data.keys())[current_row_select_custom_css]
                 selected_css = customcss_data[selected]
-                setCustomCSS(selected, selected_css)
+                if(selected_css == "DISABLE"):
+                    setDefaultCSS()
+                else:
+                    setCustomCSS(selected_css)
                 state = STATE_MAIN_MENU
         elif(state == STATE_HELP):
             if (key == ord('\n') or key == ord(' ')):

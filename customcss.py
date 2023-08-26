@@ -156,7 +156,7 @@ CSS files must have the ".css" extension.
     parser = argparse.ArgumentParser(description=description.strip())
     parser.add_argument('--revert', action='store_true', help='Reverts any changes made to Discord (does not delete CSS)')
     parser.add_argument('--file', metavar='file_or_dir', help='Location of the CSS file to copy into the discord custom css file')
-    parser.add_argument('--default', help='Set the Discord CSS to default (does not change Discord to his default state)')
+    parser.add_argument('--default', action='store_true', help='Set the Discord CSS to default (does not change Discord to his default state)')
     args = parser.parse_args()
     return args
 
@@ -248,16 +248,16 @@ def cssTransmutation(css_file_path):
         
         if(css_file_path == ""):
             with open(custom_css_file, "w") as existing_css_file:
-                # HERE NEED TO SET THE FILE TO AN EMPTY FILE
+                existing_css_file.write("")
                 print("")
         else:
             with open(css_file_path, "r") as new_css_file:
                 new_css_content = new_css_file.read()
 
             with open(custom_css_file, "w") as existing_css_file:
-                existing_css_file.write(new_css_content) # HERE NEED TO SET THE CONTENT NOT TO WRITE IN (ELSE IT WILL ADD TO THE LAST CONTENT)
+                existing_css_file.write(new_css_content)
                 
-            print("Custom CSS has been updated.")
+        print("Custom CSS has been updated.")
     else:
         print(f"Custom CSS file '{custom_css_file}' not found.")
     
@@ -295,8 +295,8 @@ def main():
             f.write('/* put your custom css here. */\n')
         with open("config.json", "r") as json_file:
             config_data = json.load(json_file)
-            config_data["custom-css-file"] = discordCustomCSS
             config_data["custom-css-initiated"] = True
+            config_data["custom-css-file"] = discordCustomCSS
         with open("config.json", "w") as json_file:
             json.dump(config_data, json_file, indent=4)
 
