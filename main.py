@@ -20,8 +20,12 @@ STATE_SELECT_CUSTOM_CSS = 6
 STATE_DELETE_CUSTOM_CSS = 7
 
 state = STATE_MAIN_MENU  # Initial state
+
 richPresence = False
 richPresenceName = ""
+
+terminal_width = 120
+terminal_height = 35
 
 def read_ascii_title():
     with open("title.txt", "r", encoding="utf-8") as file:
@@ -342,7 +346,7 @@ def main(stdscr):
     global richPresence
     global richPresenceName
     
-    #system('mode con: cols=120 lines=35') # Resize terminal window
+    system(f'mode con: cols={terminal_width} lines={terminal_height}') # Resize terminal window
 
     # Setup
     curses.curs_set(0)  # Hide the cursor
@@ -403,7 +407,7 @@ def main(stdscr):
             displayDeleteCustomCSS(stdscr, current_row_delete_custom_css, customcss_data, deleteCSSVerification)
 
         if(richPresence == True):
-            stdscr.addstr(0, 0, richPresenceName + " running.", curses.color_pair(2))
+            stdscr.addstr(terminal_height - 1, 0, richPresenceName + " running.", curses.color_pair(2))
 
         # Get user input
         key = stdscr.getch()
