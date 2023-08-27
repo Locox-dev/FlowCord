@@ -283,7 +283,7 @@ def displaySelectCustomCSS(stdscr, current_selection, customcss_data, config_dat
     global state
 
     if(config_data["custom-css-initiated"] == False):
-        rawInput(stdscr, 0, 0, "Initiating customs CSS files...")
+        stdscr.addstr(0, 0, "Initiating customs CSS files...")
         initCustomCSS()
         
     stdscr.addstr(0, 0, "                                ")
@@ -372,7 +372,7 @@ def main(stdscr):
     global richPresence
     global richPresenceName
     
-    system(f'mode con: cols={terminal_width} lines={terminal_height}') # Resize terminal window
+    system(f'mode con: cols={terminal_width} lines={terminal_height}') # Resize terminal window ONLY ON WINDOWS 10
 
     # Setup
     curses.curs_set(0)  # Hide the cursor

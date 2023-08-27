@@ -263,6 +263,8 @@ def cssTransmutation(css_file_path):
     
 
 def main():
+    config_path = os.getcwd() + "\config.json"
+    
     args = parse_args()
     try:
         discord = discord_process()
@@ -476,11 +478,11 @@ def main():
         '\nRelaunching Discord now...'
     )
     
-    with open("config.json", "r") as json_file:
+    with open(config_path, "r") as json_file:
         config_data = json.load(json_file)
         config_data["custom-css-initiated"] = True
         config_data["custom-css-file"] = discordCustomCSS
-    with open("config.json", "w") as json_file:
+    with open(config_path, "w") as json_file:
         json.dump(config_data, json_file, indent=4)
 
     discord.launch()
