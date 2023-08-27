@@ -7,6 +7,7 @@ import json
 from os import system
 import os
 import sys
+import platform
 
 
 # Define the states
@@ -380,8 +381,7 @@ def main(stdscr):
     global state
     global richPresence
     global richPresenceName
-    
-    system(f'mode con: cols={terminal_width} lines={terminal_height}') # Resize terminal window ONLY ON WINDOWS 10
+
 
     # Setup
     curses.curs_set(0)  # Hide the cursor
@@ -562,4 +562,31 @@ def main(stdscr):
         stdscr.refresh()
 
 if __name__ == "__main__":
+    if(platform.release() == 10):
+        system(f'mode con: cols={terminal_width} lines={terminal_height}') # Resize terminal window ONLY ON WINDOWS 10
+    else:
+        print("To make sure the program work properly, please set the terminal size to fullscreen using F11 or the square button.")
+        print("Time before starting:")
+        print("10")
+        time.sleep(1)
+        print("9")
+        time.sleep(1)
+        print("8")
+        time.sleep(1)
+        print("7")
+        time.sleep(1)
+        print("6")
+        time.sleep(1)
+        print("5")
+        time.sleep(1)
+        print("4")
+        time.sleep(1)
+        print("3")
+        time.sleep(1)
+        print("2")
+        time.sleep(1)
+        print("1")
+        time.sleep(1)
+        print("Starting...")
+        time.sleep(1)
     curses.wrapper(main)
