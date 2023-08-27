@@ -13,7 +13,7 @@ pip install -r requirements.txt
 
 REM Installing node packages
 echo Installing node packages from package.json
-call node install
+call npm install
 
 echo Installation DONE!
 echo You can now run start.bat to use the FlowCord tool!
