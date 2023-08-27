@@ -344,11 +344,11 @@ def openDefaultEditor(file_path):
 
 def runRichPresence(selected):
     node_cmd = ["node", "node.js", selected]
-    subprocess.run(node_cmd, text=True)
+    subprocess.run(node_cmd, shell=True)
     
 def setCustomCSS(selected, selected_css):
     py_cmd = ["python", "customcss.py", "--file", selected_css]
-    subprocess.run(py_cmd, text=True)
+    subprocess.run(py_cmd, shell=True)
     config_data = None
     with open('config.json', 'r') as json_file:
         config_data = json.load(json_file)
@@ -358,7 +358,7 @@ def setCustomCSS(selected, selected_css):
 
 def setDefaultCSS():
     py_cmd = ["python", "customcss.py", "--default"]
-    subprocess.run(py_cmd, text=True)
+    subprocess.run(py_cmd, shell=True)
     config_data = None
     with open('config.json', 'r') as json_file:
         config_data = json.load(json_file)
@@ -368,11 +368,11 @@ def setDefaultCSS():
 
 def initCustomCSS():
     py_cmd = ["python", "customcss.py"]
-    subprocess.run(py_cmd, text=True)
+    subprocess.run(py_cmd, shell=True)
     
 def revertCustomCSS():
     py_cmd = ["python", "customcss.py", "--revert"]
-    subprocess.run(py_cmd, text=True)
+    subprocess.run(py_cmd, shell=True)
 
 
 def main(stdscr):
