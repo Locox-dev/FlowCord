@@ -64,7 +64,11 @@ def displayMainMenu(stdscr, ascii_title, menu_options, current_column, current_r
                     stdscr.addstr(menu_top + row + 1, col * menu_width_multiplicator, f"  {option}")
 
 def displayHelp(stdscr, menu_options):
-    stdscr.addstr(0, 0, "VERY LONG TEXT HERE")
+    stdscr.addstr(0, 4, """HELP GUIDE \n
+    You can type `exit()` in any text inputs to go back to the main menu. \n
+    You can press the Escape key to go back to the main menu (except in inputs). \n
+    Do not use `ctrl + shift + del` to delete a full world, this will bug the input. \n
+    Use `ctrl + shift + c` and `ctrl + shift + v` to copy and paste things.""")
     stdscr.addstr(10, 10, f"> {menu_options[0][0]}", curses.color_pair(1) | curses.A_BOLD)
 
 def displayCreateRichPresence(stdscr, richpresence_data): # Always need to add something after an input or else it will all reset idk why
@@ -202,25 +206,25 @@ def displayCreateRichPresence(stdscr, richpresence_data): # Always need to add s
 
 def displaySelectRichPresence(stdscr, richpresence_data, current_selection):
     stdscr.addstr(0, 0, "Select Rich Presence:")
-    options = list(richpresence_data.keys())  # Get the keys (template/RPC names) from richpresence_data
+    keys = list(richpresence_data.keys())
 
-    for i, option in enumerate(options):
+    for i, key in enumerate(keys):
         if i == current_selection:
-            stdscr.addstr(i + 2, 0, f"> {option}", curses.color_pair(1) | curses.A_BOLD)
+            stdscr.addstr(i + 2, 0, f"> {key}", curses.color_pair(1) | curses.A_BOLD)
         else:
-            stdscr.addstr(i + 2, 0, f"  {option}")
+            stdscr.addstr(i + 2, 0, f"  {key}")
 
     stdscr.refresh()
     
 def displayDeleteRichPresence(stdscr, richpresence_data, current_selection, deleteVerification):
     stdscr.addstr(0, 0, "Delete Rich Presence: \nPress enter twice to delete the selected one.")
-    options = list(richpresence_data.keys())
+    keys = list(richpresence_data.keys())
 
-    for i, option in enumerate(options):
+    for i, key in enumerate(keys):
         if i == current_selection:
-            stdscr.addstr(i + 3, 0, f"> {option}", curses.color_pair(1) | curses.A_BOLD)
+            stdscr.addstr(i + 3, 0, f"> {key}", curses.color_pair(1) | curses.A_BOLD)
         else:
-            stdscr.addstr(i + 3, 0, f"  {option}")
+            stdscr.addstr(i + 3, 0, f"  {key}")
             
     if(deleteVerification == True):
         stdscr.addstr(current_selection + 3, len(list(richpresence_data.keys())[current_selection]) + 5, "Press again to delete.", curses.color_pair(3))
@@ -236,9 +240,19 @@ def displayCreateCustomCSS(stdscr, customcss_data):
     if(name.decode() == "exit()"):
         state = STATE_MAIN_MENU
         return
+    if(name.decode().lower() == "revert"):
+        rawInput(stdscr, 5, 0, "You can't name it 'revert', PRESS ENTER TO GO BACK TO MAIN MENU.")
+        state = STATE_MAIN_MENU
+        return
+    if(name.decode().lower() == "disable"):
+        rawInput(stdscr, 5, 0, "You can't name it 'disable', PRESS ENTER TO GO BACK TO MAIN MENU.")
+        state = STATE_MAIN_MENU
+        return
     
     if(name.decode() in customcss_data):
-        stdscr.addstr(4, 0, f"Custom CSS name '{name.decode()}' already exists!")
+        rawInput(stdscr, 4, 0, f"Custom CSS name '{name.decode()}' already exists! PRESS ENTER TO GO BACK TO MAIN MENU.")
+        state = STATE_MAIN_MENU
+        return
     else:
         filename = name.decode().replace(" ", "_").lower() + ".css"
         stdscr.addstr(5, 0, f"Creating '{filename}'...")
@@ -275,6 +289,8 @@ def displaySelectCustomCSS(stdscr, current_selection, customcss_data, config_dat
     stdscr.addstr(0, 0, "                                ")
     
     customs_css = list(customcss_data.keys())
+    revert = "Revert"
+    options.append(revert)
     
     for i, custom_css in enumerate(customs_css):
         if i == current_selection:
@@ -327,16 +343,26 @@ def runRichPresence(selected):
     node_cmd = ["node", "node.js", selected]
     subprocess.run(node_cmd, text=True)
     
-def setCustomCSS(selected_css):
+def setCustomCSS(selected, selected_css, config_data):
     py_cmd = ["python", "customcss.py", "--file", selected_css]
     subprocess.run(py_cmd, text=True)
+    config_data["custom-css-used"] = selected
+    with open('config.json', 'w') as json_file:
+        json.dump(config_data, json_file, indent=4)
 
-def setDefaultCSS():
+def setDefaultCSS(config_data):
     py_cmd = ["python", "customcss.py", "--default"]
     subprocess.run(py_cmd, text=True)
+    config_data["custom-css-used"] = ""
+    with open('config.json', 'w') as json_file:
+        json.dump(config_data, json_file, indent=4)
 
 def initCustomCSS():
     py_cmd = ["python", "customcss.py"]
+    subprocess.run(py_cmd, text=True)
+    
+def revertCustomCSS():
+    py_cmd = ["python", "customcss.py", "--revert"]
     subprocess.run(py_cmd, text=True)
 
 
@@ -406,8 +432,12 @@ def main(stdscr):
         elif(state == STATE_DELETE_CUSTOM_CSS):
             displayDeleteCustomCSS(stdscr, current_row_delete_custom_css, customcss_data, deleteCSSVerification)
 
+        if(config_data["custom-css-used"] != ""):
+            stdscr.addstr(terminal_height - 2, 0, "Custom CSS '" + config_data["custom-css-used"] + "' currently used.", curses.color_pair(2))
         if(richPresence == True):
             stdscr.addstr(terminal_height - 1, 0, richPresenceName + " running.", curses.color_pair(2))
+
+
 
         # Get user input
         key = stdscr.getch()
@@ -485,9 +515,11 @@ def main(stdscr):
                 selected = list(customcss_data.keys())[current_row_select_custom_css]
                 selected_css = customcss_data[selected]
                 if(selected_css == "DISABLE"):
-                    setDefaultCSS()
+                    setDefaultCSS(config_data)
+                elif(selected == "Revert"):
+                    revertCustomCSS()
                 else:
-                    setCustomCSS(selected_css)
+                    setCustomCSS(selected, selected_css, config_data)
                 state = STATE_MAIN_MENU
         elif(state == STATE_DELETE_CUSTOM_CSS):
             if (key == ord('z') or key == curses.KEY_UP):
