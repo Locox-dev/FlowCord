@@ -279,11 +279,14 @@ def displayCreateCustomCSS(stdscr, customcss_data):
         
     stdscr.refresh()
         
-def displaySelectCustomCSS(stdscr, current_selection, customcss_data, config_data):
+def displaySelectCustomCSS(stdscr, current_selection, customcss_data):
     global state
+    
+    with open('config.json', 'r') as json_file:
+        config_data = json.load(json_file)
 
     if(config_data["custom-css-initiated"] == False):
-        stdscr.addstr(0, 0, "Initiating customs CSS files...")
+        rawInput(stdscr, 0, 0, "PRESS ENTER TO INITIATE CUSTOM CSS")
         initCustomCSS()
         
     stdscr.addstr(0, 0, "                                ")
@@ -343,16 +346,22 @@ def runRichPresence(selected):
     node_cmd = ["node", "node.js", selected]
     subprocess.run(node_cmd, text=True)
     
-def setCustomCSS(selected, selected_css, config_data):
+def setCustomCSS(selected, selected_css):
     py_cmd = ["python", "customcss.py", "--file", selected_css]
     subprocess.run(py_cmd, text=True)
+    config_data = None
+    with open('config.json', 'r') as json_file:
+        config_data = json.load(json_file)
     config_data["custom-css-used"] = selected
     with open('config.json', 'w') as json_file:
         json.dump(config_data, json_file, indent=4)
 
-def setDefaultCSS(config_data):
+def setDefaultCSS():
     py_cmd = ["python", "customcss.py", "--default"]
     subprocess.run(py_cmd, text=True)
+    config_data = None
+    with open('config.json', 'r') as json_file:
+        config_data = json.load(json_file)
     config_data["custom-css-used"] = ""
     with open('config.json', 'w') as json_file:
         json.dump(config_data, json_file, indent=4)
@@ -428,7 +437,7 @@ def main(stdscr):
         elif(state == STATE_CREATE_CUSTOM_CSS):
             displayCreateCustomCSS(stdscr, customcss_data)
         elif(state == STATE_SELECT_CUSTOM_CSS):
-            displaySelectCustomCSS(stdscr, current_row_select_custom_css, customcss_data, config_data)
+            displaySelectCustomCSS(stdscr, current_row_select_custom_css, customcss_data)
         elif(state == STATE_DELETE_CUSTOM_CSS):
             displayDeleteCustomCSS(stdscr, current_row_delete_custom_css, customcss_data, deleteCSSVerification)
 
@@ -515,11 +524,11 @@ def main(stdscr):
                 selected = list(customcss_data.keys())[current_row_select_custom_css]
                 selected_css = customcss_data[selected]
                 if(selected_css == "DISABLE"):
-                    setDefaultCSS(config_data)
+                    setDefaultCSS()
                 elif(selected == "Revert"):
                     revertCustomCSS()
                 else:
-                    setCustomCSS(selected, selected_css, config_data)
+                    setCustomCSS(selected, selected_css)
                 state = STATE_MAIN_MENU
         elif(state == STATE_DELETE_CUSTOM_CSS):
             if (key == ord('z') or key == curses.KEY_UP):

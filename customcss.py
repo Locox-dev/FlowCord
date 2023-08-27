@@ -120,12 +120,6 @@ def extract_asar():
             try:
                 a.extract('./core')
             except FileExistsError:
-                answer = input('asar already extracted, overwrite? (Y/n): ')
-
-                if answer.lower().startswith('n'):
-                    print('Exiting.')
-                    return False
-
                 shutil.rmtree('./core')
                 a.extract('./core')
 
@@ -295,6 +289,14 @@ def main():
     if not os.path.exists(discordCustomCSS):
         with open(discordCustomCSS, 'w', encoding='utf-8') as f:
             f.write('/* put your custom css here. */\n')
+    
+    config_data = None
+    with open(config_path, "r") as json_file:
+        config_data = json.load(json_file)
+    config_data["custom-css-initiated"] = True
+    config_data["custom-css-file"] = discordCustomCSS
+    with open(config_path, "w") as json_file:
+        json.dump(config_data, json_file, indent=4)
 
 
     if not extract_asar():
@@ -478,12 +480,7 @@ def main():
         '\nRelaunching Discord now...'
     )
     
-    with open(config_path, "r") as json_file:
-        config_data = json.load(json_file)
-        config_data["custom-css-initiated"] = True
-        config_data["custom-css-file"] = discordCustomCSS
-    with open(config_path, "w") as json_file:
-        json.dump(config_data, json_file, indent=4)
+
 
     discord.launch()
 
