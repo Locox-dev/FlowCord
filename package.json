@@ -1,12 +1,12 @@
 {
-  "name": "discordrichpresence",
+  "name": "flowcord",
   "version": "1.0.0",
-  "description": "A Discord Rich Presence Program",
+  "description": "A tool for Discord App",
   "main": "node.js",
   "scripts": {
     "test": "test"
   },
-  "author": "Clément Vassaux",
+  "author": "Locox-dev",
   "license": "ISC",
   "dependencies": {
     "discord-rpc": "^4.0.1"
