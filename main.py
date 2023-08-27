@@ -283,14 +283,14 @@ def displaySelectCustomCSS(stdscr, current_selection, customcss_data, config_dat
     global state
 
     if(config_data["custom-css-initiated"] == False):
-        rawInput(stdscr, 0, 0, "Initating customs CSS files...")
+        rawInput(stdscr, 0, 0, "Initiating customs CSS files...")
         initCustomCSS()
         
     stdscr.addstr(0, 0, "                                ")
     
     customs_css = list(customcss_data.keys())
     revert = "Revert"
-    options.append(revert)
+    customs_css.append(revert)
     
     for i, custom_css in enumerate(customs_css):
         if i == current_selection:
