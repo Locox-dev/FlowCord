@@ -17,6 +17,7 @@ STATE_SELECT_RICH_PRESENCE = 3
 STATE_DELETE_RICH_PRESENCE = 4
 STATE_CREATE_CUSTOM_CSS = 5
 STATE_SELECT_CUSTOM_CSS = 6
+STATE_DELETE_CUSTOM_CSS = 7
 
 state = STATE_MAIN_MENU  # Initial state
 richPresence = False
@@ -208,8 +209,8 @@ def displaySelectRichPresence(stdscr, richpresence_data, current_selection):
     stdscr.refresh()
     
 def displayDeleteRichPresence(stdscr, richpresence_data, current_selection, deleteVerification):
-    stdscr.addstr(0, 0, "Delete Rich Presence: \nPress enter to delete twice to delete the selected one.")
-    options = list(richpresence_data.keys())  # Get the keys (template/RPC names) from richpresence_data
+    stdscr.addstr(0, 0, "Delete Rich Presence: \nPress enter twice to delete the selected one.")
+    options = list(richpresence_data.keys())
 
     for i, option in enumerate(options):
         if i == current_selection:
@@ -258,6 +259,8 @@ def displayCreateCustomCSS(stdscr, customcss_data):
         validation = rawInput(stdscr, 9, 0, f"You can still modify it by going here {css_file_path}. Press enter to finish.")
         state = STATE_MAIN_MENU
         
+    stdscr.refresh()
+        
 def displaySelectCustomCSS(stdscr, current_selection, customcss_data, config_data):
     global state
 
@@ -266,7 +269,7 @@ def displaySelectCustomCSS(stdscr, current_selection, customcss_data, config_dat
         initCustomCSS()
         
     stdscr.addstr(0, 0, "                                ")
-        
+    
     customs_css = list(customcss_data.keys())
     
     for i, custom_css in enumerate(customs_css):
@@ -274,6 +277,27 @@ def displaySelectCustomCSS(stdscr, current_selection, customcss_data, config_dat
             stdscr.addstr(i + 3, 0, f"> {custom_css}", curses.color_pair(1) | curses.A_BOLD)
         else:
             stdscr.addstr(i + 3, 0, f"  {custom_css}")
+            
+    stdscr.refresh()
+            
+def displayDeleteCustomCSS(stdscr, current_selection, customcss_data, deleteCSSVerification):
+    global state
+    
+    stdscr.addstr(0, 0, "Delete Custom CSS: \nPress enter twice to delete the selected one.")
+    
+    customs_css = list(customcss_data.keys())
+    customs_css.pop(0)
+    
+    for i, custom_css in enumerate(customs_css):
+        if i == current_selection:
+            stdscr.addstr(i + 3, 0, f"> {custom_css}", curses.color_pair(1) | curses.A_BOLD)
+        else:
+            stdscr.addstr(i + 3, 0, f"  {custom_css}")
+            
+    if(deleteCSSVerification == True):
+        stdscr.addstr(current_selection + 3, len(list(customcss_data.keys())[current_selection]) + 5, "Press again to delete.", curses.color_pair(3))
+    
+    stdscr.refresh()
 
 
 def githubPage():
@@ -340,8 +364,10 @@ def main(stdscr):
     current_row_select_rich_presence = 0
     current_row_delete_rich_presence = 0
     current_row_select_custom_css = 0
+    current_row_delete_custom_css = 0
     
     deleteVerification = False
+    deleteCSSVerification = False
     
     back_button = [
         ["Back (Escape)"]
@@ -373,10 +399,11 @@ def main(stdscr):
             displayCreateCustomCSS(stdscr, customcss_data)
         elif(state == STATE_SELECT_CUSTOM_CSS):
             displaySelectCustomCSS(stdscr, current_row_select_custom_css, customcss_data, config_data)
+        elif(state == STATE_DELETE_CUSTOM_CSS):
+            displayDeleteCustomCSS(stdscr, current_row_delete_custom_css, customcss_data, deleteCSSVerification)
 
         if(richPresence == True):
             stdscr.addstr(0, 0, richPresenceName + " running.", curses.color_pair(2))
-            
 
         # Get user input
         key = stdscr.getch()
@@ -410,6 +437,8 @@ def main(stdscr):
                     state = STATE_CREATE_CUSTOM_CSS
                 if(selected_option == "Select Custom CSS"):
                     state = STATE_SELECT_CUSTOM_CSS
+                if(selected_option == "Delete Custom CSS"):
+                    state = STATE_DELETE_CUSTOM_CSS
         elif(state == STATE_SELECT_RICH_PRESENCE):
             if (key == ord('z') or key == curses.KEY_UP):
                 current_row_select_rich_presence = max(current_row_select_rich_presence - 1, 0)
@@ -456,6 +485,26 @@ def main(stdscr):
                 else:
                     setCustomCSS(selected_css)
                 state = STATE_MAIN_MENU
+        elif(state == STATE_DELETE_CUSTOM_CSS):
+            if (key == ord('z') or key == curses.KEY_UP):
+                current_row_delete_custom_css = max(current_row_delete_custom_css - 1, 0)
+            elif (key == ord('s') or key == curses.KEY_DOWN):
+                current_row_delete_custom_css = min(current_row_delete_custom_css + 1, len(list(customcss_data.keys())) - 1)
+            elif (key == ord('\n') or key == ord(' ')):
+                selected = list(customcss_data.keys())[current_row_delete_custom_css + 1]
+                selected_css = customcss_data[selected]
+                if(deleteCSSVerification == False):
+                    deleteCSSVerification = True
+                else:
+                    if(selected in customcss_data):
+                        del customcss_data[selected]
+
+                    with open('customcss.json', 'w') as json_file:
+                        json.dump(customcss_data, json_file, indent=4)
+                        
+                    os.remove(selected_css)
+                        
+                    deleteCSSVerification = False
         elif(state == STATE_HELP):
             if (key == ord('\n') or key == ord(' ')):
                 state = STATE_MAIN_MENU

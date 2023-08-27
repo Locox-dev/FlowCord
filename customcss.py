@@ -293,12 +293,7 @@ def main():
     if not os.path.exists(discordCustomCSS):
         with open(discordCustomCSS, 'w', encoding='utf-8') as f:
             f.write('/* put your custom css here. */\n')
-        with open("config.json", "r") as json_file:
-            config_data = json.load(json_file)
-            config_data["custom-css-initiated"] = True
-            config_data["custom-css-file"] = discordCustomCSS
-        with open("config.json", "w") as json_file:
-            json.dump(config_data, json_file, indent=4)
+
 
     if not extract_asar():
         discord.launch()
@@ -480,6 +475,13 @@ def main():
         "which will be reloaded whenever it's saved.\n" +
         '\nRelaunching Discord now...'
     )
+    
+    with open("config.json", "r") as json_file:
+        config_data = json.load(json_file)
+        config_data["custom-css-initiated"] = True
+        config_data["custom-css-file"] = discordCustomCSS
+    with open("config.json", "w") as json_file:
+        json.dump(config_data, json_file, indent=4)
 
     discord.launch()
 
