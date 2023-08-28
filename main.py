@@ -302,6 +302,9 @@ def displayDeleteCustomCSS(stdscr, current_selection, customcss_data, deleteCSSV
 
 def githubPage():
     webbrowser.open('https://github.com/Locox-dev/FlowCord')
+    
+def discordLink():
+    webbrowser.open('https://discord.gg/7jU3nWjqGX')
 
 def rawInput(stdscr, r, c, prompt_string):
     curses.echo() 
@@ -389,7 +392,7 @@ def main(stdscr):
     # Create some UI elements
     ascii_title = read_ascii_title()
     menu_options = [
-        ["Help", "Github Page", "Donate"],
+        ["Help", "Github Page", "Discord"],
         ["Create Rich Presence", "Select Rich Presence", "Delete Rich Presence"],
         ["Create Custom CSS", "Select Custom CSS", "Delete Custom CSS"]
     ]
@@ -467,6 +470,8 @@ def main(stdscr):
                     githubPage()
                 if(selected_option == "Help"):
                     state = STATE_HELP
+                if(selected_option == "Discord"):
+                    discordLink()
                 if(selected_option == "Create Rich Presence"):
                     state = STATE_CREATE_RICH_PRESENCE
                 if(selected_option == "Select Rich Presence"):
