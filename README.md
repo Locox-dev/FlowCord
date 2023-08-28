@@ -10,7 +10,7 @@ Also for developers, it's easy to modify/fork as you like.
 ### Requirements
 - [Python 3+](https://www.python.org/downloads/)
 - [Node JS](https://nodejs.org/en/download)
-- [Windows 10](https://www.microsoft.com/en-us/software-download/windows10%20) (Currently the only supported version)
+- [Windows 10+](https://www.microsoft.com/windows) (Windows 7 not tested yet)
 ### Installation guide
 1. Download the latest release of FlowCord for your OS.
 2. Extract it where you want it.
