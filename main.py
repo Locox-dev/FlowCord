@@ -168,7 +168,7 @@ def displayCreateRichPresence(stdscr, richpresence_data): # Always need to add s
             }
             
             # Enregistrez les données mises à jour dans le fichier JSON
-            with open("richpresence.json", "w") as json_file:
+            with open("JSON/richpresence.json", "w") as json_file:
                 json.dump(richpresence_data, json_file, indent=4)
             
             validation = rawInput(stdscr, 30, 0, "SAVE DONE, PRESS ENTER TO GO BACK TO THE MAIN MENU")
@@ -239,7 +239,7 @@ def displayCreateCustomCSS(stdscr, customcss_data):
         
         css_file_path = os.path.abspath(f"CustomsCSS/{filename}")
         customcss_data[name.decode()] = css_file_path
-        with open('customcss.json', 'w') as json_file:
+        with open('JSON/customcss.json', 'w') as json_file:
             json.dump(customcss_data, json_file, indent=4)
         
         with open(css_file_path, 'w') as css_file:
@@ -259,7 +259,7 @@ def displayCreateCustomCSS(stdscr, customcss_data):
 def displaySelectCustomCSS(stdscr, current_selection, customcss_data):
     global state
     
-    with open('config.json', 'r') as json_file:
+    with open('JSON/config.json', 'r') as json_file:
         config_data = json.load(json_file)
 
     if(config_data["custom-css-initiated"] == False):
@@ -332,10 +332,10 @@ def setCustomCSS(selected, selected_css):
     py_cmd = ["python", "customcss.py", "--file", selected_css]
     subprocess.run(py_cmd, shell=True)
     config_data = None
-    with open('config.json', 'r') as json_file:
+    with open('JSON/config.json', 'r') as json_file:
         config_data = json.load(json_file)
     config_data["custom-css-used"] = selected
-    with open('config.json', 'w') as json_file:
+    with open('JSON/config.json', 'w') as json_file:
         json.dump(config_data, json_file, indent=4)
     customCSS = True
     customCSSName = selected
@@ -346,10 +346,10 @@ def setDefaultCSS():
     py_cmd = ["python", "customcss.py", "--default"]
     subprocess.run(py_cmd, shell=True)
     config_data = None
-    with open('config.json', 'r') as json_file:
+    with open('JSON/config.json', 'r') as json_file:
         config_data = json.load(json_file)
     config_data["custom-css-used"] = ""
-    with open('config.json', 'w') as json_file:
+    with open('JSON/config.json', 'w') as json_file:
         json.dump(config_data, json_file, indent=4)
     customCSS = False
     customCSSName = ""
@@ -410,13 +410,13 @@ def main(stdscr):
         ["Back (Escape)"]
     ]
 
-    with open('config.json', 'r') as json_file:
+    with open('JSON/config.json', 'r') as json_file:
         config_data = json.load(json_file)
 
-    with open("richpresence.json", "r") as json_file:
+    with open("JSON/richpresence.json", "r") as json_file:
         richpresence_data = json.load(json_file)
         
-    with open('customcss.json', 'r') as json_file:
+    with open('JSON/customcss.json', 'r') as json_file:
         customcss_data = json.load(json_file)
 
     while True:
@@ -514,7 +514,7 @@ def main(stdscr):
                     if(selected in richpresence_data):
                         del richpresence_data[selected]
 
-                    with open('richpresence.json', 'w') as json_file:
+                    with open('JSON/richpresence.json', 'w') as json_file:
                         json.dump(richpresence_data, json_file, indent=4)
                         
                     deleteVerification = False
@@ -555,7 +555,7 @@ def main(stdscr):
                     if(selected in customcss_data):
                         del customcss_data[selected]
 
-                    with open('customcss.json', 'w') as json_file:
+                    with open('JSON/customcss.json', 'w') as json_file:
                         json.dump(customcss_data, json_file, indent=4)
                         
                     os.remove(selected_css)
@@ -573,31 +573,31 @@ def main(stdscr):
         stdscr.refresh()
 
 if __name__ == "__main__":
-    if(platform.release() == "10"):
-        system(f'mode con: cols={terminal_width} lines={terminal_height}') # Resize terminal window ONLY ON WINDOWS 10
-    else:
-        print("To make sure the program work properly, please set the terminal size to fullscreen using F11 or the square button.")
-        print("Time before starting:")
-        print("10")
-        time.sleep(1)
-        print("9")
-        time.sleep(1)
-        print("8")
-        time.sleep(1)
-        print("7")
-        time.sleep(1)
-        print("6")
-        time.sleep(1)
-        print("5")
-        time.sleep(1)
-        print("4")
-        time.sleep(1)
-        print("3")
-        time.sleep(1)
-        print("2")
-        time.sleep(1)
-        print("1")
-        time.sleep(1)
-        print("Starting...")
-        time.sleep(1)
+    #if(platform.release() == "10"):
+    #    system(f'mode con: cols={terminal_width} lines={terminal_height}') # Resize terminal window ONLY ON WINDOWS 10
+    #else:
+    #    print("To make sure the program work properly, please set the terminal size to fullscreen using F11 or the square button.")
+    #    print("Time before starting:")
+    #    print("10")
+    #    time.sleep(1)
+    #    print("9")
+    #    time.sleep(1)
+    #    print("8")
+    #    time.sleep(1)
+    #    print("7")
+    #    time.sleep(1)
+    #    print("6")
+    #    time.sleep(1)
+    #    print("5")
+    #    time.sleep(1)
+    #    print("4")
+    #    time.sleep(1)
+    #    print("3")
+    #    time.sleep(1)
+    #    print("2")
+    #    time.sleep(1)
+    #    print("1")
+    #    time.sleep(1)
+    #    print("Starting...")
+    #    time.sleep(1)
     curses.wrapper(main)

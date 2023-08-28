@@ -238,7 +238,7 @@ def allow_https():
         f.write(bypass_csp + '\n' + content)
         
 def cssTransmutation(css_file_path):
-    with open("config.json", "r") as json_file:
+    with open("JSON/config.json", "r") as json_file:
         config_data = json.load(json_file)
         
     if(not config_data["custom-css-initiated"]):
@@ -266,7 +266,7 @@ def cssTransmutation(css_file_path):
     
 
 def main():
-    config_path = os.getcwd() + "\config.json"
+    config_path = os.getcwd() + "\JSON/config.json"
     
     args = parse_args()
     try:
