@@ -83,27 +83,19 @@ def displayCreateRichPresence(stdscr, richpresence_data): # Always need to add s
     if(tutorial.decode().lower() == "y" or tutorial.decode().lower() == "yes"):
         createrpc_thread = threading.Thread(target=createInstructions)
         createrpc_thread.start()
-    if(tutorial.decode() == "exit()"):
-        state = STATE_MAIN_MENU
-        return
+    if(isItExit(tutorial.decode())): return
     richPresenceName = rawInput(stdscr, 5, 0, "Name:")
-    if(richPresenceName.decode() == "exit()"):
-        state = STATE_MAIN_MENU
-        return
+    if(isItExit(richPresenceName.decode())): return
     if(richPresenceName.decode() != ""):
         stdscr.addstr(6, 0, "> " + richPresenceName.decode() + " saved!")
         
         clientID = rawInput(stdscr, 7, 0, "Client ID (*):") 
-        if(clientID.decode() == "exit()"):
-            state = STATE_MAIN_MENU
-            return
+        if(isItExit(clientID.decode())): return
         if(len(clientID.decode()) >= 17):
             stdscr.addstr(8, 0, "> " + clientID.decode() + " saved!")
             
             largeImageName = rawInput(stdscr, 9, 0, "Large Image Name (default: large):")
-            if(largeImageName.decode() == "exit()"):
-                state = STATE_MAIN_MENU
-                return
+            if(isItExit(largeImageName.decode())): return
             largeImageNameReal = ""
             if(largeImageName.decode() == ""):
                 largeImageNameReal = "large"
@@ -112,18 +104,14 @@ def displayCreateRichPresence(stdscr, richpresence_data): # Always need to add s
             stdscr.addstr(10, 0, "> " + largeImageNameReal + " saved!")
                 
             largeImageText = rawInput(stdscr, 11, 0, "Large Image Text:")
-            if(largeImageText.decode() == "exit()"):
-                state = STATE_MAIN_MENU
-                return
+            if(isItExit(largeImageText.decode())): return
             if(largeImageText.decode() != "" and len(largeImageText.decode()) < 2):
                 err = rawInput(stdscr, 12, 0, "Large Image Text should be at least 2 character long or none. \n  PRESS ENTER TO RETURN BACK TO MAIN MENU.")
                 state = STATE_MAIN_MENU
             stdscr.addstr(12, 0, "> " + largeImageText.decode() + " saved!")
             
             smallImageName = rawInput(stdscr, 13, 0, "Small Image Name (default: small):")
-            if(smallImageName.decode() == "exit()"):
-                state = STATE_MAIN_MENU
-                return
+            if(isItExit(smallImageName.decode())): return
             smallImageNameReal = ""
             if(smallImageName.decode() == ""):
                 smallImageNameReal = "small"
@@ -132,51 +120,38 @@ def displayCreateRichPresence(stdscr, richpresence_data): # Always need to add s
             stdscr.addstr(14, 0, "> " + smallImageNameReal + " saved!")
             
             smallImageText = rawInput(stdscr, 15, 0, "Small Image Text:")
-            if(smallImageText.decode() == "exit()"):
-                state = STATE_MAIN_MENU
-                return
+            if(isItExit(smallImageText.decode())): return
             if(smallImageText.decode() != "" and len(smallImageText.decode()) < 2):
                 err = rawInput(stdscr, 16, 0, "Small Image Text should be at least 2 character long or none. \n  PRESS ENTER TO RETURN BACK TO MAIN MENU.")
                 state = STATE_MAIN_MENU
             stdscr.addstr(16, 0, "> " + smallImageText.decode() + " saved!")
             
             button1Name = rawInput(stdscr, 17, 0, "Button 1 Name:")
-            if(button1Name.decode() == "exit()"):
-                state = STATE_MAIN_MENU
-                return
+            if(isItExit(button1Name.decode())): return
             stdscr.addstr(18, 0, "> " + button1Name.decode() + " saved!")
             
             button1URL = rawInput(stdscr, 19, 0, "Button 1 URL:")
-            if(button1URL.decode() == "exit()"):
-                state = STATE_MAIN_MENU
-                return
+            if(isItExit(button1URL.decode())): return
             stdscr.addstr(20, 0, "> " + button1URL.decode() + " saved!")
             
             button2Name = rawInput(stdscr, 21, 0, "Button 2 Name:")
-            if(button2Name.decode() == "exit()"):
-                state = STATE_MAIN_MENU
-                return
+            if(isItExit(button2Name.decode())): return
             stdscr.addstr(22, 0, "> " + button2Name.decode() + " saved!")
             
             button2URL = rawInput(stdscr, 23, 0, "Button 2 URL:")
-            if(button2URL.decode() == "exit()"):
-                state = STATE_MAIN_MENU
-                return
+            if(isItExit(button2URL.decode())): return
             stdscr.addstr(24, 0, "> " + button2URL.decode() + " saved!")
             
             stateRPC = rawInput(stdscr, 25, 0, "State:")
-            if(stateRPC.decode() == "exit()"):
-                state = STATE_MAIN_MENU
-                return
+            if(isItExit(stateRPC.decode())): return
             stdscr.addstr(26, 0, "> " + stateRPC.decode() + " saved!")
             
             details = rawInput(stdscr, 27, 0, "Details:")
-            if(details.decode() == "exit()"):
-                state = STATE_MAIN_MENU
-                return
+            if(isItExit(details.decode())): return
             stdscr.addstr(28, 0, "> " + details.decode() + " saved!")
             
             saver = rawInput(stdscr, 29, 0, "PRESS ENTER TO SAVE")
+            if(isItExit(saver.decode())): return
                         
             richpresence_data[richPresenceName.decode()] = {  # Crée une nouvelle entrée avec le numéro trouvé
                 "ClientID": clientID.decode(),
@@ -241,9 +216,7 @@ def displayCreateCustomCSS(stdscr, customcss_data):
     stdscr.addstr(2, 0, "Press shift + ctrl + v to paste things. (*) mean this field is mandatory.")
     name = rawInput(stdscr, 3, 0, "Custom CSS name: ")
     
-    if(name.decode() == "exit()"):
-        state = STATE_MAIN_MENU
-        return
+    if(isItExit(name.decode())): return
     if(name.decode().lower() == "revert"):
         rawInput(stdscr, 5, 0, "You can't name it 'revert', PRESS ENTER TO GO BACK TO MAIN MENU.")
         state = STATE_MAIN_MENU
@@ -389,7 +362,14 @@ def revertCustomCSS():
     subprocess.run(py_cmd, text=True, shell=True)
     customCSS = False
     customCSSName = ""
-
+    
+def isItExit(text):
+    global state
+    if(text == "exit()"):
+        state = STATE_MAIN_MENU
+        return True
+    else:
+        return False
 
 def main(stdscr):
 
