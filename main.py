@@ -25,6 +25,9 @@ state = STATE_MAIN_MENU  # Initial state
 richPresence = False
 richPresenceName = ""
 
+customCSS = False
+customCSSName = ""
+
 terminal_width = 120
 terminal_height = 35
 
@@ -348,6 +351,8 @@ def runRichPresence(selected):
     subprocess.run(node_cmd, shell=True)
     
 def setCustomCSS(selected, selected_css):
+    global customCSS
+    global customCSSName
     py_cmd = ["python", "customcss.py", "--file", selected_css]
     subprocess.run(py_cmd, shell=True)
     config_data = None
@@ -356,6 +361,8 @@ def setCustomCSS(selected, selected_css):
     config_data["custom-css-used"] = selected
     with open('config.json', 'w') as json_file:
         json.dump(config_data, json_file, indent=4)
+    customCSS = True
+    customCSSName = selected
 
 def setDefaultCSS():
     py_cmd = ["python", "customcss.py", "--default"]
@@ -441,8 +448,11 @@ def main(stdscr):
         elif(state == STATE_DELETE_CUSTOM_CSS):
             displayDeleteCustomCSS(stdscr, current_row_delete_custom_css, customcss_data, deleteCSSVerification)
 
-        if(config_data["custom-css-used"] != ""):
-            stdscr.addstr(terminal_height - 2, 0, "Custom CSS '" + config_data["custom-css-used"] + "' currently used.", curses.color_pair(2))
+        if(config_data["custom-css-used"] != "" or customCSS == True):
+            if(customCSS == True):
+                stdscr.addstr(terminal_height - 2, 0, "Custom CSS '" + customCSSName + "' currently used.", curses.color_pair(2))
+            else:
+                stdscr.addstr(terminal_height - 2, 0, "Custom CSS '" + config_data["custom-css-used"] + "' currently used.", curses.color_pair(2))
         if(richPresence == True):
             stdscr.addstr(terminal_height - 1, 0, richPresenceName + " running.", curses.color_pair(2))
 
