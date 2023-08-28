@@ -195,13 +195,22 @@ def discord_process():
                 key = lookup[index]
                 return executables[key]
 
-def revert_changes(discord):
+def revert_changes(discord, config_path):
     try:
         shutil.move('./original_core.asar', './core.asar')
     except FileNotFoundError as e:
         print('No changes to revert.')
     else:
         print('Reverted changes, no more CSS hot-reload :(')
+        
+    config_data = None
+    with open(config_path, "r") as json_file:
+        config_data = json.load(json_file)
+    config_data["custom-css-initiated"] = False
+    config_data["custom-css-file"] = ""
+    config_data["custom-css-used"] = ""
+    with open(config_path, "w") as json_file:
+        json.dump(config_data, json_file, indent=4)
 
     discord.launch()
 
@@ -284,7 +293,7 @@ def main():
     discord.terminate()
 
     if args.revert:
-        return revert_changes(discord)
+        return revert_changes(discord, config_path)
 
     if not os.path.exists(discordCustomCSS):
         with open(discordCustomCSS, 'w', encoding='utf-8') as f:
@@ -457,7 +466,7 @@ def main():
         # failed replace for some reason?
         print('warning: nothing was done.\n' \
               'note: blur event was not found for the injection point.')
-        revert_changes(discord)
+        revert_changes(discord, config_path)
         discord.launch()
         return
 

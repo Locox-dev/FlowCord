@@ -365,6 +365,8 @@ def setCustomCSS(selected, selected_css):
     customCSSName = selected
 
 def setDefaultCSS():
+    global customCSS
+    global customCSSName
     py_cmd = ["python", "customcss.py", "--default"]
     subprocess.run(py_cmd, shell=True)
     config_data = None
@@ -373,14 +375,20 @@ def setDefaultCSS():
     config_data["custom-css-used"] = ""
     with open('config.json', 'w') as json_file:
         json.dump(config_data, json_file, indent=4)
+    customCSS = False
+    customCSSName = ""
 
 def initCustomCSS():
     py_cmd = ["python", "customcss.py"]
     subprocess.run(py_cmd, shell=True)
     
 def revertCustomCSS():
+    global customCSS
+    global customCSSName
     py_cmd = ["python", "customcss.py", "--revert"]
-    subprocess.run(py_cmd, shell=True)
+    subprocess.run(py_cmd, text=True, shell=True)
+    customCSS = False
+    customCSSName = ""
 
 
 def main(stdscr):
@@ -529,16 +537,22 @@ def main(stdscr):
             if (key == ord('z') or key == curses.KEY_UP):
                 current_row_select_custom_css = max(current_row_select_custom_css - 1, 0)
             elif (key == ord('s') or key == curses.KEY_DOWN):
-                current_row_select_custom_css = min(current_row_select_custom_css + 1, len(list(customcss_data.keys())) - 1)
+                current_row_select_custom_css = min(current_row_select_custom_css + 1, len(list(customcss_data.keys())))
             elif (key == ord('\n') or key == ord(' ')):
-                selected = list(customcss_data.keys())[current_row_select_custom_css]
-                selected_css = customcss_data[selected]
-                if(selected_css == "DISABLE"):
-                    setDefaultCSS()
-                elif(selected == "Revert"):
+                customs_css = list(customcss_data.keys())
+                revert = "Revert"
+                customs_css.append(revert)
+                selected = list(customs_css)[current_row_select_custom_css]
+            
+                if(selected == "Revert"):
                     revertCustomCSS()
                 else:
-                    setCustomCSS(selected, selected_css)
+                    selected_css = customcss_data[selected]
+                
+                    if(selected_css == "DISABLE"):
+                        setDefaultCSS()
+                    else:
+                        setCustomCSS(selected, selected_css)
                 state = STATE_MAIN_MENU
         elif(state == STATE_DELETE_CUSTOM_CSS):
             if (key == ord('z') or key == curses.KEY_UP):
@@ -546,6 +560,8 @@ def main(stdscr):
             elif (key == ord('s') or key == curses.KEY_DOWN):
                 current_row_delete_custom_css = min(current_row_delete_custom_css + 1, len(list(customcss_data.keys())) - 1)
             elif (key == ord('\n') or key == ord(' ')):
+                revert = "Revert"
+                customs_css.append(revert)
                 selected = list(customcss_data.keys())[current_row_delete_custom_css + 1]
                 selected_css = customcss_data[selected]
                 if(deleteCSSVerification == False):
