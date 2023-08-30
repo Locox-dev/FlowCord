@@ -14,6 +14,7 @@ Also for developers, it's easy to modify/fork as you like.
 ### Installation guide
 1. Download the latest release of FlowCord for your OS.
 2. Extract it where you want it.
-3. Launch the installer.bat script by double clicking on it.
+3. Launch the installer.bat script.
 4. Launch FlowCord by launching the start.bat script.
+5. (Optional) You can create a shortcut for the tool by right clicking on start.bat and selecting 'Create shortcut'. You can move this shortcut anywhere on your computer.
 ![](https://github.com/Locox-dev/Locox-dev/blob/main/flowcord1.gif)
