@@ -250,8 +250,9 @@ def displayCreateCustomCSS(stdscr, customcss_data):
         stdscr.addstr(6, 0, f"Opening '{filename}'...")
         openDefaultEditor(css_file_path)
         
-        rawInput(stdscr, 7, 0, f"Press enter to save your custom CSS.")
-        validation = rawInput(stdscr, 9, 0, f"You can still modify it by going here {css_file_path}. Press enter to finish.")
+        rawInput(stdscr, 7, 0, "Press enter to save your custom CSS.")
+        stdscr.addstr(8, 0, f"You can still modify it by going here {css_file_path}.")
+        rawInput(stdscr, 9, 0, "Press enter to finish.")
         state = STATE_MAIN_MENU
         
     stdscr.refresh()
