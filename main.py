@@ -78,7 +78,7 @@ def displayHelp(stdscr, menu_options):
 def displayCreateRichPresence(stdscr, richpresence_data): # Always need to add something after an input or else it will all reset idk why
     global state
     
-    stdscr.addstr(2, 0, "Press shift + ctrl + v to paste things. (*) mean this field is mandatory.")
+    stdscr.addstr(2, 0, "Press shift + ctrl + v to paste things. Enter 'exit()' to quit the creation process.")
     tutorial = rawInput(stdscr, 3, 0, "Do you want the tutorial? If yes write 'y' else press enter.")
     if(tutorial.decode().lower() == "y" or tutorial.decode().lower() == "yes"):
         createrpc_thread = threading.Thread(target=createInstructions)
@@ -89,7 +89,7 @@ def displayCreateRichPresence(stdscr, richpresence_data): # Always need to add s
     if(richPresenceName.decode() != ""):
         stdscr.addstr(6, 0, "> " + richPresenceName.decode() + " saved!")
         
-        clientID = rawInput(stdscr, 7, 0, "Client ID (*):") 
+        clientID = rawInput(stdscr, 7, 0, "Client ID:") 
         if(isItExit(clientID.decode())): return
         if(len(clientID.decode()) >= 17):
             stdscr.addstr(8, 0, "> " + clientID.decode() + " saved!")
@@ -213,7 +213,7 @@ def displayDeleteRichPresence(stdscr, richpresence_data, current_selection, dele
 def displayCreateCustomCSS(stdscr, customcss_data):
     global state
     
-    stdscr.addstr(2, 0, "Press shift + ctrl + v to paste things. (*) mean this field is mandatory.")
+    stdscr.addstr(2, 0, "Press shift + ctrl + v to paste things. Enter 'exit()' to quit the creation process.")
     name = rawInput(stdscr, 3, 0, "Custom CSS name: ")
     
     if(isItExit(name.decode())): return
