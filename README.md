@@ -18,3 +18,10 @@ Also for developers, it's easy to modify/fork as you like.
 4. Launch FlowCord by launching the start.bat script.
 5. (Optional) You can create a shortcut for the tool by right clicking on start.bat and selecting 'Create shortcut'. You can move this shortcut anywhere on your computer.
 ![](https://github.com/Locox-dev/Locox-dev/blob/main/flowcord1.gif)
+
+### Troubleshooting
+If you encounter this error:
+```py
+_curses.error: addwstr() returned ERR
+```
+This is because the script is trying to write some UI and there is not enough place. To resolve it, just maximize the terminal window size (so everything fit in it).
