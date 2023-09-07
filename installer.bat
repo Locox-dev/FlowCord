@@ -33,5 +33,10 @@ REM Installing node packages
 echo Installing node packages from package.json.
 call npm install
 
+REM Initializing configuration
+echo Initializing configuration in JSON/config.json file.
+call venv\Scripts\activate.bat
+python os_checker.py
+
 echo Installation done!
 echo You can now run start.bat to use the FlowCord tool!

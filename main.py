@@ -574,9 +574,12 @@ def main(stdscr):
         stdscr.refresh()
 
 if __name__ == "__main__":
-    if(platform.release() == "10"):
+    data = []
+    with open('JSON/config.json', 'r') as json_file:
+        data = json.load(json_file)
+    if(data["OS_NAME"] == "Windows" and data["OS_VERSION"] == "10"):
         system(f'mode con: cols={terminal_width} lines={terminal_height}') # Resize terminal window ONLY ON WINDOWS 10
-    else:
+    elif(data["OS_NAME"] == "Windows" and data["OS_VERSION"] == "11"):
         print("To make sure the program work properly, please set the terminal size to fullscreen using F11 or the square button.")
         print("Time before starting:")
         print("10")
